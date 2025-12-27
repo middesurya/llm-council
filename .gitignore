@@ -43,5 +43,9 @@ next-env.d.ts
 # drizzle
 /drizzle
 
+# logs
+/logs
+*.log
+
 # problematic file
 nul
