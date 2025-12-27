@@ -11,13 +11,19 @@
   "dependencies": {
     "next": "16.1.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "drizzle-orm": "^0.33.0",
+    "pg": "^8.13.0",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/pg": "^8.11.10",
+    "@types/uuid": "^10.0.0",
+    "drizzle-kit": "^0.28.1",
     "eslint": "^9",
     "eslint-config-next": "16.1.0",
     "tailwindcss": "^4",
