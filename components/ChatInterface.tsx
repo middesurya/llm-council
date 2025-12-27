@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import FeedbackForm from "./FeedbackForm";
 
 interface ChatInterfaceProps {
   domain?: string;
@@ -17,6 +18,8 @@ export default function ChatInterface({
   const [response, setResponse] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [useStreaming, setUseStreaming] = useState(true);
+  const [streamingContent, setStreamingContent] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,21 +28,72 @@ export default function ChatInterface({
     setLoading(true);
     setError(null);
     setResponse(null);
+    setStreamingContent("");
 
     try {
-      const res = await fetch("/api/council/query", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, domain }),
-      });
+      if (useStreaming) {
+        // Use streaming endpoint
+        const res = await fetch("/api/council/query/stream", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, domain }),
+        });
 
-      const data = await res.json();
+        if (!res.ok) {
+          const errorData = await res.json();
+          throw new Error(errorData.error || "Failed to get response");
+        }
 
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to get response");
+        const reader = res.body?.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        if (!reader) throw new Error("Response body is not readable");
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() || "";
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || !trimmed.startsWith("data: ")) continue;
+
+            try {
+              const json = JSON.parse(trimmed.slice(6));
+              if (json.type === "token") {
+                setStreamingContent((prev) => prev + json.content);
+              } else if (json.type === "init") {
+                setResponse({ queryId: json.queryId, domain: json.domain });
+              } else if (json.type === "complete") {
+                setResponse((prev: any) => ({ ...prev, queryId: json.queryId }));
+              } else if (json.type === "error") {
+                throw new Error(json.error);
+              }
+            } catch (e) {
+              console.error("Failed to parse SSE data:", e);
+            }
+          }
+        }
+      } else {
+        // Use non-streaming endpoint
+        const res = await fetch("/api/council/query", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query, domain }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to get response");
+        }
+
+        setResponse(data);
       }
-
-      setResponse(data);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -55,22 +109,35 @@ export default function ChatInterface({
       </div>
 
       <form onSubmit={handleSubmit} className="mb-6">
-        <div className="flex gap-3">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ask your question..."
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            disabled={loading}
-          />
-          <button
-            type="submit"
-            disabled={loading || !query.trim()}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
-          >
-            {loading ? "Processing..." : "Ask"}
-          </button>
+        <div className="flex flex-col gap-3">
+          <div className="flex gap-3 items-center">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Ask your question..."
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading}
+            />
+            <button
+              type="submit"
+              disabled={loading || !query.trim()}
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+            >
+              {loading ? "Processing..." : "Ask"}
+            </button>
+          </div>
+
+          {/* Streaming Toggle */}
+          <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={useStreaming}
+              onChange={(e) => setUseStreaming(e.target.checked)}
+              className="rounded"
+            />
+            <span>Enable streaming responses (see answers appear in real-time)</span>
+          </label>
         </div>
       </form>
 
@@ -80,68 +147,82 @@ export default function ChatInterface({
         </div>
       )}
 
-      {response && (
+      {(response || streamingContent) && (
         <div className="space-y-6">
+          {/* Streaming or Final Answer */}
           <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-            <h2 className="text-2xl font-bold mb-4">Final Answer</h2>
+            <h2 className="text-2xl font-bold mb-4">
+              Final Answer
+              {loading && streamingContent && <span className="ml-2 text-sm font-normal text-gray-500">(Streaming...)</span>}
+            </h2>
             <div className="prose max-w-none">
               <pre className="whitespace-pre-wrap font-sans text-gray-800">
-                {response.stage3.synthesis}
+                {streamingContent || response?.stage3?.synthesis || ""}
               </pre>
             </div>
           </div>
 
-          <details className="bg-white border border-gray-200 rounded-lg shadow-sm">
-            <summary className="px-6 py-4 cursor-pointer hover:bg-gray-50 font-medium">
-              View Expert Answers (Stage 1)
-            </summary>
-            <div className="px-6 pb-6 space-y-4">
-              {response.stage1.map((answer: any, idx: number) => (
-                <div
-                  key={idx}
-                  className="p-4 bg-gray-50 rounded-lg border border-gray-200"
-                >
-                  <h3 className="font-semibold text-lg capitalize">
-                    {answer.provider} ({answer.model})
-                  </h3>
-                  <pre className="mt-2 whitespace-pre-wrap text-sm text-gray-700">
-                    {answer.answer}
-                  </pre>
-                </div>
-              ))}
-            </div>
-          </details>
+          {/* Show Stage 1 & 2 only for non-streaming responses */}
+          {!useStreaming && response?.stage1 && (
+            <details className="bg-white border border-gray-200 rounded-lg shadow-sm">
+              <summary className="px-6 py-4 cursor-pointer hover:bg-gray-50 font-medium">
+                View Expert Answers (Stage 1)
+              </summary>
+              <div className="px-6 pb-6 space-y-4">
+                {response.stage1.map((answer: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className="p-4 bg-gray-50 rounded-lg border border-gray-200"
+                  >
+                    <h3 className="font-semibold text-lg capitalize">
+                      {answer.provider} ({answer.model})
+                    </h3>
+                    <pre className="mt-2 whitespace-pre-wrap text-sm text-gray-700">
+                      {answer.answer}
+                    </pre>
+                  </div>
+                ))}
+              </div>
+            </details>
+          )}
 
-          <details className="bg-white border border-gray-200 rounded-lg shadow-sm">
-            <summary className="px-6 py-4 cursor-pointer hover:bg-gray-50 font-medium">
-              View Peer Reviews (Stage 2)
-            </summary>
-            <div className="px-6 pb-6 space-y-3">
-              {response.stage2.map((review: any, idx: number) => (
-                <div
-                  key={idx}
-                  className="p-3 bg-blue-50 rounded-lg border border-blue-100"
-                >
-                  <p className="text-sm">
-                    <span className="font-semibold capitalize">
-                      {review.reviewerProvider}
-                    </span>{" "}
-                    ranked{" "}
-                    <span className="font-semibold capitalize">
-                      {review.targetProvider}
-                    </span>{" "}
-                    as <strong>#{review.ranking}</strong>
-                  </p>
-                  <p className="text-sm text-gray-700 mt-1">
-                    {review.reasoning}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </details>
+          {!useStreaming && response?.stage2 && (
+            <details className="bg-white border border-gray-200 rounded-lg shadow-sm">
+              <summary className="px-6 py-4 cursor-pointer hover:bg-gray-50 font-medium">
+                View Peer Reviews (Stage 2)
+              </summary>
+              <div className="px-6 pb-6 space-y-3">
+                {response.stage2.map((review: any, idx: number) => (
+                  <div
+                    key={idx}
+                    className="p-3 bg-blue-50 rounded-lg border border-blue-100"
+                  >
+                    <p className="text-sm">
+                      <span className="font-semibold capitalize">
+                        {review.reviewerProvider}
+                      </span>{" "}
+                      ranked{" "}
+                      <span className="font-semibold capitalize">
+                        {review.targetProvider}
+                      </span>{" "}
+                      as <strong>#{review.ranking}</strong>
+                    </p>
+                    <p className="text-sm text-gray-700 mt-1">
+                      {review.reasoning}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </details>
+          )}
+
+          {/* Feedback Form */}
+          {response?.queryId && !loading && (
+            <FeedbackForm queryId={response.queryId} />
+          )}
 
           <div className="text-sm text-gray-500 text-center">
-            Query ID: {response.queryId} | Domain: {response.domain}
+            Query ID: {response?.queryId} | Domain: {response?.domain || domain}
           </div>
         </div>
       )}
