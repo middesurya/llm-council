@@ -26,7 +26,7 @@ Your task is to:
 Be concise but thorough. Prioritize accuracy over speed.`,
     models: {
       openai: "gpt-4-turbo-preview",
-      anthropic: "claude-3-5-sonnet-20241022",
+      anthropic: "claude-3-opus-20240229",
       google: "gemini-pro",
     },
   },
@@ -52,7 +52,7 @@ Format your response to include:
 Always include appropriate disclaimers and emphasize when professional medical consultation is required.`,
     models: {
       openai: "gpt-4-turbo-preview",
-      anthropic: "claude-3-5-sonnet-20241022",
+      anthropic: "claude-3-opus-20240229",
       google: "gemini-pro",
     },
   },
@@ -79,7 +79,7 @@ Format your response to include:
 Always emphasize that this is for informational purposes and recommend professional advice for specific decisions.`,
     models: {
       openai: "gpt-4-turbo-preview",
-      anthropic: "claude-3-5-sonnet-20241022",
+      anthropic: "claude-3-opus-20240229",
       google: "gemini-pro",
     },
   },

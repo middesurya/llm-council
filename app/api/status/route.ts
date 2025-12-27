@@ -13,7 +13,7 @@ export async function GET() {
     try {
       const models: Record<string, string> = {
         openai: "gpt-4-turbo-preview",
-        anthropic: "claude-3-5-sonnet-20241022",
+        anthropic: "claude-3-opus-20240229",
         google: "gemini-pro",
       };
 
@@ -50,7 +50,7 @@ export async function GET() {
           provider === "openai"
             ? "gpt-4-turbo-preview"
             : provider === "anthropic"
-            ? "claude-3-5-sonnet-20241022"
+            ? "claude-3-opus-20240229"
             : "gemini-pro",
         error: error.message || "Unknown error",
       };
