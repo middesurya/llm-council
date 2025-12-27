@@ -13,26 +13,94 @@ Phase 3 focuses on deep domain specialization through knowledge base integration
 
 **File:** `src/lib/knowledge/healthcare-kb.ts`
 
-**ICD-10 Code Database:**
-- 8 common ICD-10 codes with categorization
-  - I10: Essential hypertension
-  - I21: Acute myocardial infarction
-  - J06: Upper respiratory infections
-  - M54.5: Low back pain
-  - R07: Pain in throat and chest
-  - R51: Headache
-  - E11: Type 2 diabetes
-  - J45: Asthma
+**ICD-10 Code Database (Expanded - 50+ codes):**
+
+*Circulatory System (9 codes):*
+- I10: Essential (primary) hypertension
+- I11: Hypertensive heart disease
+- I12: Hypertensive renal disease
+- I20: Angina pectoris
+- I21: Acute myocardial infarction
+- I25: Chronic ischemic heart disease
+- I50: Heart failure
+- I63: Cerebral infarction (stroke)
+- I69: Sequelae of cerebrovascular disease
+
+*Respiratory System (9 codes):*
+- J01: Acute sinusitis
+- J02: Acute pharyngitis
+- J03: Acute tonsillitis
+- J06: Acute upper respiratory infections
+- J18: Pneumonia
+- J20: Acute bronchitis
+- J45: Asthma
+- J47: Bronchiectasis
+- J81: Pulmonary edema
+
+*Digestive System (7 codes):*
+- K29: Gastritis and duodenitis
+- K30: Diseases of esophagus (GERD)
+- K35: Acute appendicitis
+- K40: Cholelithiasis (gallstones)
+- K42: Cholecystitis
+- K44: Gastroesophageal reflux
+- K59.9: Functional intestinal disorder (IBS)
+
+*Musculoskeletal (6 codes):*
+- M25.5: Pain in joint
+- M54.5: Low back pain
+- M79.3: Pain in limb
+- M54.2: Cervicalgia (neck pain)
+- M75: Shoulder lesions
+- M70: Soft tissue disorders
+
+*Nervous System (5 codes):*
+- G43: Migraine
+- G44: Other headache syndromes
+- G35: Multiple sclerosis
+- G40: Epilepsy
+- G61: Inflammatory polyneuropathy
+
+*Mental Health (3 codes):*
+- F32: Depressive episode
+- F41: Anxiety disorders
+- F33: Recurrent depressive disorder
+
+*Endocrine (4 codes):*
+- E03: Hypothyroidism
+- E05: Thyrotoxicosis
+- E10: Type 1 diabetes
+- E11: Type 2 diabetes
+
+*Symptoms (10 codes):*
+- R05: Cough
+- R06: Abnormalities of breathing
+- R07: Pain in throat and chest
+- R10: Abdominal and pelvic pain
+- R11: Nausea and vomiting
+- R13: Dysphagia
+- R50: Fever
+- R51: Headache
+- R55: Signs and symptoms (fatigue)
+- Z00: General examination
 
 **Features:**
 - **Keyword-based search** for relevant codes
-- **Category classification** (Circulatory, Respiratory, Musculoskeletal, Symptoms, Endocrine)
+- **Category classification** (8 major categories)
 - **Code + description + keywords** for matching
+- **Comprehensive coverage** across body systems
 
-**Medical Reference Knowledge:**
-- Chest Pain Evaluation (differential diagnosis)
-- Hypertension Management (classification and treatment)
-- Diabetes Type 2 (diagnostic criteria)
+**Medical Reference Knowledge (Expanded - 10 topics):**
+1. Chest Pain Evaluation - Differential diagnosis (cardiac, pulmonary, GI, musculoskeletal)
+2. Hypertension Management - ACC/AHA 2017 classification, lifestyle modifications, medications
+3. Diabetes Type 2 - ADA diagnostic criteria, management, complications monitoring
+4. Asthma Management - Classification (intermittent to severe persistent), controller/rescue medications
+5. Pneumonia Evaluation - CAP vs HAP vs aspiration, pathogens, diagnosis (CURB-65)
+6. Appendicitis - Signs (pain migration, GI symptoms), physical exam findings (McBurney's point)
+7. Acute Coronary Syndrome - STEMI/NSTEMI/Unstable angina classification, diagnosis, treatment
+8. Stroke Evaluation - Ischemic vs hemorrhagic, FAST assessment, imaging, treatment
+9. Depression Screening - PHQ-9 questionnaire, severity levels, treatment options
+10. Anxiety Disorders - GAD, panic disorder, social anxiety, physical symptoms, treatments
 
 **Functions:**
 - `searchICD10Codes(query)` - Find relevant codes
@@ -43,30 +111,82 @@ Phase 3 focuses on deep domain specialization through knowledge base integration
 
 **File:** `src/lib/knowledge/finance-kb.ts`
 
-**Accounting Standards Database:**
-- GAAP Standards:
-  - ASC 606: Revenue Recognition
-  - ASC 842: Leases
-  - ASC 820: Fair Value Measurement
-  - ASC 330: Inventory
+**Accounting Standards Database (Expanded - 28 standards):**
 
-- IFRS Standards:
-  - IFRS 15: Revenue from Contracts
-  - IFRS 16: Leases
-  - IFRS 9: Financial Instruments
-  - IFRS 13: Fair Value Measurement
+*Revenue & Contracts (2 standards):*
+- ASC 606 (GAAP): Revenue from Contracts with Customers
+- IFRS 15 (IFRS): Revenue from Contracts with Customers
+
+*Leases (2 standards):*
+- ASC 842 (GAAP): Leases
+- IFRS 16 (IFRS): Leases
+
+*Fair Value & Valuation (2 standards):*
+- ASC 820 (GAAP): Fair Value Measurement
+- IFRS 13 (IFRS): Fair Value Measurement
+
+*Financial Instruments (4 standards):*
+- IFRS 9 (IFRS): Financial Instruments (classification, ECL model, hedge accounting)
+- ASC 326 (GAAP): Credit Losses (CECL model)
+- ASC 815 (GAAP): Derivatives and Hedging
+- IFRS 7 (IFRS): Financial Instruments Disclosures
+
+*Assets & Inventory (5 standards):*
+- ASC 330 (GAAP): Inventory (FIFO, LIFO, weighted average)
+- ASC 360 (GAAP): Property, Plant, and Equipment (depreciation, impairment)
+- IAS 16 (IFRS): Property, Plant, and Equipment (revaluation model)
+- IAS 2 (IFRS): Inventories (FIFO, weighted average, NRV)
+- IAS 36 (IFRS): Impairment of Assets (recoverable amount)
+
+*Intangibles & Goodwill (3 standards):*
+- ASC 350 (GAAP): Intangibles - Goodwill and Other
+- IAS 38 (IFRS): Intangible Assets (amortization)
+- IFRS 3 (IFRS): Business Combinations (goodwill, PPA)
+
+*Liabilities & Equity (4 standards):*
+- ASC 480 (GAAP): Distinguishing Liabilities from Equity
+- IAS 32 (IFRS): Financial Instruments - Presentation
+- ASC 718 (GAAP): Compensation - Stock Compensation
+- IFRS 2 (IFRS): Share-Based Payment
+
+*Income Statement & Performance (2 standards):*
+- ASC 225 (GAAP): Income Statement
+- IAS 1 (IFRS): Presentation of Financial Statements
+
+*Income Taxes (2 standards):*
+- ASC 740 (GAAP): Income Taxes (deferred tax, uncertain tax positions)
+- IAS 12 (IFRS): Income Taxes
+
+*Earnings Per Share (2 standards):*
+- ASC 260 (GAAP): Earnings Per Share
+- IAS 33 (IFRS): Earnings Per Share
+
+*Cash Flows (2 standards):*
+- ASC 230 (GAAP): Statement of Cash Flows
+- IAS 7 (IFRS): Statement of Cash Flows
 
 **Features:**
 - **Framework classification** (GAAP vs IFRS)
-- **Detailed descriptions** of each standard
+- **Comprehensive coverage** of all major accounting areas
+- **Convergence tracking** (GAAP/IFRS alignment)
 - **Keyword matching** for relevance
 
-**Financial Reference Knowledge:**
-- Revenue Recognition (ASC 606 / IFRS 15) - Five-step model
-- Lease Accounting (ASC 842 / IFRS 16) - Balance sheet recognition
-- Fair Value Hierarchy (ASC 820 / IFRS 13) - Level 1/2/3
-- Financial Statement Analysis Ratios - Liquidity, Profitability, Solvency
-- Revenue Forecasting Methods - CAGR, trend analysis, market-based
+**Financial Reference Knowledge (Expanded - 15 topics):**
+1. Revenue Recognition (ASC 606 / IFRS 15) - Five-step model, variable consideration
+2. Lease Accounting (ASC 842 / IFRS 16) - ROU assets, lease liabilities
+3. Fair Value Hierarchy (ASC 820 / IFRS 13) - Level 1/2/3 inputs
+4. Financial Statement Analysis Ratios - Liquidity, profitability, solvency, efficiency ratios
+5. Revenue Forecasting Methods - CAGR, trend analysis, market-based, unit economics
+6. Credit Loss Modeling (CECL / IFRS 9) - Expected credit losses, three-stage model
+7. Business Combinations (IFRS 3 / ASC 805) - Acquisition method, goodwill, PPA
+8. Asset Impairment Testing - GAAP vs IFRS approaches, recoverable amount
+9. Derivative Instruments and Hedging - Types, hedge accounting, effectiveness testing
+10. Income Tax Provision (ASC 740 / IAS 12) - Current/deferred tax, DTA/DTL, uncertain tax positions
+11. Inventory Valuation Methods - FIFO/LIFO, LCM vs LCNRV, impact on financials
+12. Stock-Based Compensation - ASC 718 / IFRS 2, valuation methods, performance conditions
+13. Earnings Per Share (EPS) - Basic vs diluted, treasury stock method, anti-dilution
+14. Cash Flow Statement Presentation - Operating/investing/financing, reconciliation
+15. Revenue Recognition - Special Topics - Variable consideration, principal vs agent, returns
 
 **Functions:**
 - `searchAccountingStandards(query)` - Find relevant standards
@@ -218,22 +338,22 @@ if (enhancedQuery !== councilQuery.query) {
 
 ## Known Limitations
 
-1. **Keyword-only matching** - No semantic search yet
-2. **Limited knowledge base** - Only 8 codes each, 3-5 references
-3. **Manual curation** - Knowledge is hardcoded, not dynamic
-4. **No feedback loop** - Can't learn from user corrections
-5. **No knowledge provenance** - Can't cite specific sources
+1. **Keyword-only matching** - No semantic search yet (vector database pending)
+2. **Static knowledge base** - Knowledge is hardcoded, requires code changes to update
+3. **No feedback loop** - Can't learn from user corrections
+4. **No knowledge provenance** - Can't cite specific sources with links
+5. **No admin interface** - Requires developer to modify knowledge base files
 
 ## Next Steps (Remaining Phase 3)
 
-1. ✅ Create healthcare knowledge base (ICD-10/SNOMED)
-2. ✅ Create finance knowledge base (GAAP/IFRS)
-3. ✅ Integrate knowledge enhancement into orchestrators
-4. ⏳ Add vector database for semantic search
-5. ⏳ Expand knowledge base (more codes, standards, references)
-6. ⏳ Create admin panel for knowledge management
-7. ⏳ Add knowledge provenance tracking
-8. ⏳ Test with real-world queries
+1. ✅ Create healthcare knowledge base (ICD-10/SNOMED) - **COMPLETED (50+ codes, 10 references)**
+2. ✅ Create finance knowledge base (GAAP/IFRS) - **COMPLETED (28 standards, 15 references)**
+3. ✅ Integrate knowledge enhancement into orchestrators - **COMPLETED**
+4. ✅ Expand knowledge base (more codes, standards, references) - **COMPLETED**
+5. ⏳ Add vector database for semantic search - **PENDING**
+6. ⏳ Create admin panel for knowledge management - **PENDING**
+7. ⏳ Add knowledge provenance tracking - **PENDING**
+8. ⏳ Test with real-world queries - **PENDING**
 
 ## Phase 4 Preview (Future)
 
