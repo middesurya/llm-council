@@ -3,6 +3,8 @@
 import { useState } from "react";
 import FeedbackForm from "./FeedbackForm";
 import DomainDisclaimer from "./DomainDisclaimer";
+import StructuredInput from "./StructuredInput";
+import DocumentUpload from "./DocumentUpload";
 import { getModelPersona } from "@/lib/utils/personas";
 
 interface ChatInterfaceProps {
@@ -29,6 +31,20 @@ export default function ChatInterface({
     e.preventDefault();
     if (!query.trim()) return;
 
+    await submitQuery(query, domain);
+  };
+
+  const handleStructuredSubmit = (data: any) => {
+    setQuery(data.query);
+    submitQuery(data.query, data.domain);
+  };
+
+  const handleDocumentAnalyze = (query: string, content: string) => {
+    setQuery(query);
+    submitQuery(query, domain);
+  };
+
+  const submitQuery = async (queryText: string, domainValue: string) => {
     setLoading(true);
     setError(null);
     setResponse(null);
@@ -42,7 +58,7 @@ export default function ChatInterface({
         const res = await fetch("/api/council/query/stream", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query, domain }),
+          body: JSON.stringify({ query: queryText, domain: domainValue }),
         });
 
         if (!res.ok) {
@@ -91,7 +107,7 @@ export default function ChatInterface({
         const res = await fetch("/api/council/query", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ query, domain }),
+          body: JSON.stringify({ query: queryText, domain: domainValue }),
         });
 
         const data = await res.json();
@@ -118,6 +134,12 @@ export default function ChatInterface({
 
       {/* Domain-Specific Disclaimer */}
       <DomainDisclaimer domain={domain} />
+
+      {/* Structured Input Helpers */}
+      <StructuredInput domain={domain} onSubmit={handleStructuredSubmit} />
+
+      {/* Document Upload */}
+      <DocumentUpload domain={domain} onAnalyze={handleDocumentAnalyze} />
 
       <form onSubmit={handleSubmit} className="mb-6">
         <div className="flex flex-col gap-3">
