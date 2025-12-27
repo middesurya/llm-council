@@ -25,16 +25,19 @@ export default function FeedbackForm({ queryId }: FeedbackFormProps) {
     setSubmitting(true);
     setError(null);
 
+    const feedbackData = {
+      queryId,
+      rating,
+      category: category || undefined,
+      comment: comment.trim() || undefined,
+      timestamp: new Date().toISOString(),
+    };
+
     try {
       const res = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          queryId,
-          rating,
-          category: category || undefined,
-          comment: comment.trim() || undefined,
-        }),
+        body: JSON.stringify(feedbackData),
       });
 
       const data = await res.json();
@@ -45,7 +48,17 @@ export default function FeedbackForm({ queryId }: FeedbackFormProps) {
 
       setSubmitted(true);
     } catch (err: any) {
-      setError(err.message);
+      // Fallback: Store in localStorage if database fails
+      try {
+        const existing = JSON.parse(localStorage.getItem("llm_council_feedback") || "[]");
+        existing.push(feedbackData);
+        localStorage.setItem("llm_council_feedback", JSON.stringify(existing));
+
+        // Show success even though database failed (feedback saved locally)
+        setSubmitted(true);
+      } catch (localErr) {
+        setError(err.message);
+      }
     } finally {
       setSubmitting(false);
     }

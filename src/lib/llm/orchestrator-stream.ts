@@ -181,16 +181,16 @@ export async function* orchestrateCouncilStreaming(
   stage3Logger.start();
 
   try {
-    // Wait a bit for Stage 1 to complete so we have answers to synthesize
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    // Wait for background processing to at least finish Stage 1
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Re-check stage1Results after waiting
+    // Wait for Stage 1 to complete so we have answers to synthesize
+    // LLMs can take 10-30 seconds, so we wait with exponential backoff
+    const maxWaitTime = 60000; // 60 seconds max wait
+    const startTime = Date.now();
     let attempts = 0;
-    while (stage1Results.length === 0 && attempts < 30) {
-      await new Promise(resolve => setTimeout(resolve, 100));
+
+    while (stage1Results.length === 0 && (Date.now() - startTime) < maxWaitTime) {
+      // Exponential backoff: 100ms, 200ms, 400ms, 800ms, ... up to 2s
+      const backoffTime = Math.min(100 * Math.pow(2, attempts), 2000);
+      await new Promise(resolve => setTimeout(resolve, backoffTime));
       attempts++;
     }
 

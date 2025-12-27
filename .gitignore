@@ -49,3 +49,10 @@ next-env.d.ts
 
 # problematic file
 nul
+
+# test scripts
+test_*.bat
+test_*.ps1
+
+# claude settings (local)
+.claude/settings.local.json
