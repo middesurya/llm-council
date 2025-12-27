@@ -2,11 +2,17 @@ import { v4 as randomUUID } from "uuid";
 import { getLLMConfig, LLMConfig } from "@/config/llm-config";
 import { getDomainConfig, DomainConfig } from "@/config/domains";
 import { generateWithClient } from "./index";
+import { logWithContext, logStage } from "@/lib/observability";
+import { metricsCollector } from "@/lib/observability";
+import { trackProviderError, ErrorCategory } from "@/lib/observability";
+import { enhanceQueryWithKnowledge } from "@/lib/knowledge";
 
 export interface ExpertAnswer {
   provider: string;
   model: string;
   answer: string;
+  success: boolean;
+  tokensUsed?: number;
 }
 
 export interface PeerReview {
@@ -29,6 +35,17 @@ export interface CouncilResponse {
     synthesis: string;
   };
   timestamp: string;
+  metrics?: {
+    stage1Duration: number;
+    stage2Duration: number;
+    stage3Duration: number;
+    totalDuration: number;
+    tokenUsage?: {
+      openai?: number;
+      anthropic?: number;
+      google?: number;
+    };
+  };
 }
 
 export interface CouncilQuery {
@@ -43,36 +60,113 @@ export async function orchestrateCouncil(councilQuery: CouncilQuery): Promise<Co
   const domainConfig = getDomainConfig(domain);
 
   if (!domainConfig) {
-    throw new Error(`Unknown domain: ${domain}`);
+    const error = new Error(`Unknown domain: ${domain}`);
+    throw error;
   }
 
   const models = domainConfig.models;
 
+  // Initialize metrics collection
+  metricsCollector.initialize(queryId, domain);
+  logWithContext.info('Council orchestration started', { queryId, domain });
+
+  // Track stage timings
+  const timings = {
+    stage1Start: Date.now(),
+    stage1End: 0,
+    stage2Start: 0,
+    stage2End: 0,
+    stage3Start: 0,
+    stage3End: 0,
+  };
+
+  // Track provider success
+  const providerSuccess: Record<string, boolean> = {};
+
+  // Enhance query with domain-specific knowledge
+  const enhancedQuery = enhanceQueryWithKnowledge(councilQuery.query, councilQuery.domain || "general");
+
+  if (enhancedQuery !== councilQuery.query) {
+    logWithContext.info('Query enhanced with knowledge context', {
+      queryId,
+      domain,
+      originalLength: councilQuery.query.length,
+      enhancedLength: enhancedQuery.length,
+    });
+  }
+
   // Stage 1: Divergent Answers - Each LLM provides their independent answer
-  console.log(`[${queryId}] Stage 1: Gathering divergent answers...`);
+  const stage1Logger = logStage('stage1', queryId, domain);
+  stage1Logger.start();
+
+  logWithContext.info('Gathering divergent answers', { queryId, domain, stage: 'stage1' });
+
   const stage1Promises = Object.entries(models).map(async ([provider, model]) => {
     try {
       const config = getLLMConfig(provider as any, model);
       const answer = await generateWithClient(
         config,
         domainConfig.systemPrompt,
-        councilQuery.query
+        enhancedQuery
       );
-      return { provider, model, answer };
+
+      providerSuccess[provider] = true;
+
+      // TODO: Extract actual token usage from API response
+      // For now, estimate based on answer length
+      const estimatedTokens = Math.ceil(answer.length / 4);
+      metricsCollector.recordTokenUsage(queryId, provider as any, estimatedTokens);
+
+      logWithContext.info(`${provider} answer received`, {
+        queryId,
+        domain,
+        provider,
+        answerLength: answer.length
+      });
+
+      return { provider, model, answer, success: true, tokensUsed: estimatedTokens };
     } catch (error) {
-      console.error(`[${queryId}] ${provider} error:`, error);
+      providerSuccess[provider] = false;
+
+      trackProviderError(
+        provider,
+        error instanceof Error ? error : new Error(String(error)),
+        { queryId, domain, stage: 'stage1' }
+      );
+
+      logWithContext.error(`${provider} failed to generate answer`, error, {
+        queryId,
+        domain,
+        provider
+      });
+
       return {
         provider,
         model,
         answer: `[Error: ${error instanceof Error ? error.message : String(error)}]`,
+        success: false,
+        tokensUsed: 0,
       };
     }
   });
 
   const stage1Results = await Promise.all(stage1Promises);
 
+  timings.stage1End = Date.now();
+  const stage1Duration = timings.stage1End - timings.stage1Start;
+  metricsCollector.recordStage(queryId, 'stage1', stage1Duration);
+  stage1Logger.complete(stage1Duration, {
+    providers: stage1Results.length,
+    successful: stage1Results.filter(r => r.success).length
+  });
+
   // Stage 2: Peer Review - Each LLM reviews all answers and ranks them
-  console.log(`[${queryId}] Stage 2: Conducting peer review...`);
+  timings.stage2Start = Date.now();
+  const stage2Logger = logStage('stage2', queryId, domain);
+  stage2Logger.start();
+
+  logWithContext.info('Conducting peer review', { queryId, domain, stage: 'stage2' });
+
   const stage2Promises = Object.entries(models).map(async ([reviewerProvider, reviewerModel]) => {
     try {
       const config = getLLMConfig(reviewerProvider as any, reviewerModel);
@@ -119,6 +213,12 @@ Respond in this exact JSON format:
 
       const reviewData = JSON.parse(jsonMatch[0]);
 
+      metricsCollector.recordTokenUsage(
+        queryId,
+        reviewerProvider as any,
+        Math.ceil(reviewResponse.length / 4)
+      );
+
       return reviewData.rankings.map((r: any) => ({
         reviewerProvider,
         reviewerModel,
@@ -127,7 +227,12 @@ Respond in this exact JSON format:
         reasoning: r.reasoning,
       }));
     } catch (error) {
-      console.error(`[${queryId}] Peer review by ${reviewerProvider} error:`, error);
+      trackProviderError(
+        reviewerProvider,
+        error instanceof Error ? error : new Error(String(error)),
+        { queryId, domain, stage: 'stage2' }
+      );
+
       // Return default rankings if review fails
       return stage1Results.map((a, idx) => ({
         reviewerProvider,
@@ -141,6 +246,13 @@ Respond in this exact JSON format:
 
   const stage2Results = (await Promise.all(stage2Promises)).flat();
 
+  timings.stage2End = Date.now();
+  const stage2Duration = timings.stage2End - timings.stage2Start;
+  metricsCollector.recordStage(queryId, 'stage2', stage2Duration);
+  stage2Logger.complete(stage2Duration, {
+    reviews: stage2Results.length
+  });
+
   // Calculate average rankings to find the best answer
   const avgRankings: Record<string, number> = {};
   stage2Results.forEach((review) => {
@@ -151,14 +263,23 @@ Respond in this exact JSON format:
   });
 
   Object.keys(avgRankings).forEach((provider) => {
-    avgRankings[provider] = avgRankings[provider] / 3; // Average across 3 reviewers
+    avgRankings[provider] = avgRankings[provider] / Object.keys(models).length;
   });
 
   const bestProvider = Object.entries(avgRankings).sort((a, b) => a[1] - b[1])[0][0];
   const bestAnswer = stage1Results.find((a) => a.provider === bestProvider)!;
 
   // Stage 3: Final Synthesis - Best answer synthesizes all insights
-  console.log(`[${queryId}] Stage 3: Creating final synthesis...`);
+  timings.stage3Start = Date.now();
+  const stage3Logger = logStage('stage3', queryId, domain);
+  stage3Logger.start();
+
+  logWithContext.info('Creating final synthesis', {
+    queryId,
+    domain,
+    synthesizer: bestProvider
+  });
+
   const synthesisConfig = getLLMConfig(bestProvider as any, bestAnswer.model);
 
   const allAnswersText = stage1Results
@@ -185,6 +306,37 @@ Provide the final synthesis answer:`;
     synthesisPrompt
   );
 
+  metricsCollector.recordTokenUsage(
+    queryId,
+    bestProvider as any,
+    Math.ceil(synthesis.length / 4)
+  );
+
+  timings.stage3End = Date.now();
+  const stage3Duration = timings.stage3End - timings.stage3Start;
+  metricsCollector.recordStage(queryId, 'stage3', stage3Duration);
+  stage3Logger.complete(stage3Duration);
+
+  // Record provider success rates
+  Object.entries(providerSuccess).forEach(([provider, success]) => {
+    metricsCollector.recordProviderSuccess(queryId, provider as any, success);
+  });
+
+  // Complete metrics collection
+  const finalMetrics = metricsCollector.complete(queryId);
+
+  const totalDuration = stage1Duration + stage2Duration + stage3Duration;
+
+  logWithContext.info('Council orchestration completed', {
+    queryId,
+    domain,
+    totalDuration,
+    stage1Duration,
+    stage2Duration,
+    stage3Duration,
+    synthesizer: bestProvider,
+  });
+
   return {
     queryId,
     domain,
@@ -197,5 +349,12 @@ Provide the final synthesis answer:`;
       synthesis,
     },
     timestamp: new Date().toISOString(),
+    metrics: {
+      stage1Duration,
+      stage2Duration,
+      stage3Duration,
+      totalDuration,
+      tokenUsage: finalMetrics?.tokenUsage,
+    },
   };
 }

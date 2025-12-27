@@ -43,5 +43,16 @@ next-env.d.ts
 # drizzle
 /drizzle
 
+# logs
+/logs
+*.log
+
 # problematic file
 nul
+
+# test scripts
+test_*.bat
+test_*.ps1
+
+# claude settings (local)
+.claude/settings.local.json

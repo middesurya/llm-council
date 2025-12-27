@@ -1,9 +1,21 @@
 {
+  "env": {
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "glm-4.7"
+  },
   "permissions": {
     "allow": [
       "Bash(git add:*)",
       "Bash(git reset:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(timeout:*)",
+      "Bash(python:*)",
+      "Bash(find:*)",
+      "Bash(npm install winston winston-daily-rotate-file joi validator express-rate-limit @types/validator --save)",
+      "Bash(npx drizzle-kit generate:*)",
+      "Bash(npm update:*)",
+      "Bash(npm install:*)"
     ]
   }
 }
