@@ -5,6 +5,7 @@ import { generateWithClient } from "./index";
 import { logWithContext, logStage } from "@/lib/observability";
 import { metricsCollector } from "@/lib/observability";
 import { trackProviderError, ErrorCategory } from "@/lib/observability";
+import { enhanceQueryWithKnowledge } from "@/lib/knowledge";
 
 export interface ExpertAnswer {
   provider: string;
@@ -82,6 +83,18 @@ export async function orchestrateCouncil(councilQuery: CouncilQuery): Promise<Co
   // Track provider success
   const providerSuccess: Record<string, boolean> = {};
 
+  // Enhance query with domain-specific knowledge
+  const enhancedQuery = enhanceQueryWithKnowledge(councilQuery.query, councilQuery.domain || "general");
+
+  if (enhancedQuery !== councilQuery.query) {
+    logWithContext.info('Query enhanced with knowledge context', {
+      queryId,
+      domain,
+      originalLength: councilQuery.query.length,
+      enhancedLength: enhancedQuery.length,
+    });
+  }
+
   // Stage 1: Divergent Answers - Each LLM provides their independent answer
   const stage1Logger = logStage('stage1', queryId, domain);
   stage1Logger.start();
@@ -94,7 +107,7 @@ export async function orchestrateCouncil(councilQuery: CouncilQuery): Promise<Co
       const answer = await generateWithClient(
         config,
         domainConfig.systemPrompt,
-        councilQuery.query
+        enhancedQuery
       );
 
       providerSuccess[provider] = true;

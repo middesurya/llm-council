@@ -8,6 +8,7 @@ import { generateWithOpenAI } from "./openai-client";
 import { generateWithAnthropic } from "./anthropic-client";
 import { logWithContext, logStage } from "@/lib/observability";
 import { checkContent } from "@/lib/security/content-filter";
+import { enhanceQueryWithKnowledge } from "@/lib/knowledge";
 
 interface ExpertAnswer {
   provider: string;
@@ -66,6 +67,18 @@ export async function* orchestrateCouncilStreaming(
     return;
   }
 
+  // Enhance query with domain-specific knowledge
+  const enhancedQuery = enhanceQueryWithKnowledge(councilQuery.query, domain);
+
+  if (enhancedQuery !== councilQuery.query) {
+    logWithContext.info('Query enhanced with knowledge context', {
+      queryId,
+      domain,
+      originalLength: councilQuery.query.length,
+      enhancedLength: enhancedQuery.length,
+    });
+  }
+
   let stage1Results: ExpertAnswer[] = [];
   let stage2Results: PeerReview[] = [];
   let hasError = false;
@@ -83,9 +96,9 @@ export async function* orchestrateCouncilStreaming(
           let answer: string;
 
           if (provider === 'openai') {
-            answer = await generateWithOpenAI(config, domainConfig.systemPrompt, councilQuery.query);
+            answer = await generateWithOpenAI(config, domainConfig.systemPrompt, enhancedQuery);
           } else if (provider === 'anthropic') {
-            answer = await generateWithAnthropic(config, domainConfig.systemPrompt, councilQuery.query);
+            answer = await generateWithAnthropic(config, domainConfig.systemPrompt, enhancedQuery);
           } else {
             throw new Error(`Unknown provider: ${provider}`);
           }
