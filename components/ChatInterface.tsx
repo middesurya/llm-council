@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import FeedbackForm from "./FeedbackForm";
+import DomainDisclaimer from "./DomainDisclaimer";
+import { getModelPersona } from "@/lib/utils/personas";
 
 interface ChatInterfaceProps {
   domain?: string;
@@ -20,6 +22,8 @@ export default function ChatInterface({
   const [error, setError] = useState<string | null>(null);
   const [useStreaming, setUseStreaming] = useState(true);
   const [streamingContent, setStreamingContent] = useState("");
+  const [stage1Data, setStage1Data] = useState<any[]>([]);
+  const [stage2Data, setStage2Data] = useState<any[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +33,8 @@ export default function ChatInterface({
     setError(null);
     setResponse(null);
     setStreamingContent("");
+    setStage1Data([]);
+    setStage2Data([]);
 
     try {
       if (useStreaming) {
@@ -70,6 +76,8 @@ export default function ChatInterface({
                 setResponse({ queryId: json.queryId, domain: json.domain });
               } else if (json.type === "complete") {
                 setResponse((prev: any) => ({ ...prev, queryId: json.queryId }));
+                setStage1Data(json.stage1 || []);
+                setStage2Data(json.stage2 || []);
               } else if (json.type === "error") {
                 throw new Error(json.error);
               }
@@ -107,6 +115,9 @@ export default function ChatInterface({
         <h1 className="text-4xl font-bold mb-2">{title}</h1>
         <p className="text-gray-600">{description}</p>
       </div>
+
+      {/* Domain-Specific Disclaimer */}
+      <DomainDisclaimer domain={domain} />
 
       <form onSubmit={handleSubmit} className="mb-6">
         <div className="flex flex-col gap-3">
@@ -162,56 +173,66 @@ export default function ChatInterface({
             </div>
           </div>
 
-          {/* Show Stage 1 & 2 only for non-streaming responses */}
-          {!useStreaming && response?.stage1 && (
+          {/* Show Stage 1 & 2 for both streaming and non-streaming */}
+          {(stage1Data.length > 0 || (!useStreaming && response?.stage1)) && (
             <details className="bg-white border border-gray-200 rounded-lg shadow-sm">
               <summary className="px-6 py-4 cursor-pointer hover:bg-gray-50 font-medium">
                 View Expert Answers (Stage 1)
               </summary>
               <div className="px-6 pb-6 space-y-4">
-                {response.stage1.map((answer: any, idx: number) => (
-                  <div
-                    key={idx}
-                    className="p-4 bg-gray-50 rounded-lg border border-gray-200"
-                  >
-                    <h3 className="font-semibold text-lg capitalize">
-                      {answer.provider} ({answer.model})
-                    </h3>
-                    <pre className="mt-2 whitespace-pre-wrap text-sm text-gray-700">
-                      {answer.answer}
-                    </pre>
-                  </div>
-                ))}
+                {(stage1Data.length > 0 ? stage1Data : response?.stage1 || []).map((answer: any, idx: number) => {
+                  const persona = getModelPersona(answer.provider, domain);
+                  return (
+                    <div
+                      key={idx}
+                      className="p-4 bg-gray-50 rounded-lg border border-gray-200"
+                    >
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <span>{persona.icon}</span>
+                        <span>{persona.name}</span>
+                        <span className="text-sm font-normal text-gray-500">({persona.title})</span>
+                        <span className="text-xs text-gray-400 ml-auto">{answer.model}</span>
+                      </h3>
+                      <pre className="mt-2 whitespace-pre-wrap text-sm text-gray-700">
+                        {answer.answer}
+                      </pre>
+                    </div>
+                  );
+                })}
               </div>
             </details>
           )}
 
-          {!useStreaming && response?.stage2 && (
+          {(stage2Data.length > 0 || (!useStreaming && response?.stage2)) && (
             <details className="bg-white border border-gray-200 rounded-lg shadow-sm">
               <summary className="px-6 py-4 cursor-pointer hover:bg-gray-50 font-medium">
                 View Peer Reviews (Stage 2)
               </summary>
               <div className="px-6 pb-6 space-y-3">
-                {response.stage2.map((review: any, idx: number) => (
-                  <div
-                    key={idx}
-                    className="p-3 bg-blue-50 rounded-lg border border-blue-100"
-                  >
-                    <p className="text-sm">
-                      <span className="font-semibold capitalize">
-                        {review.reviewerProvider}
-                      </span>{" "}
-                      ranked{" "}
-                      <span className="font-semibold capitalize">
-                        {review.targetProvider}
-                      </span>{" "}
-                      as <strong>#{review.ranking}</strong>
-                    </p>
-                    <p className="text-sm text-gray-700 mt-1">
-                      {review.reasoning}
-                    </p>
-                  </div>
-                ))}
+                {(stage2Data.length > 0 ? stage2Data : response?.stage2 || []).map((review: any, idx: number) => {
+                  const reviewerPersona = getModelPersona(review.reviewerProvider, domain);
+                  const targetPersona = getModelPersona(review.targetProvider, domain);
+                  return (
+                    <div
+                      key={idx}
+                      className="p-3 bg-blue-50 rounded-lg border border-blue-100"
+                    >
+                      <p className="text-sm">
+                        <span className="font-semibold" title={reviewerPersona.title}>
+                          {reviewerPersona.icon} {reviewerPersona.name}
+                        </span>{" "}
+                        ranked{" "}
+                        <span className="font-semibold" title={targetPersona.title}>
+                          {targetPersona.icon} {targetPersona.name}
+                        </span>{" "}
+                        as <strong>#{review.ranking}</strong>
+                      </p>
+                      <p className="text-sm text-gray-700 mt-1">
+                        {review.reasoning}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
             </details>
           )}

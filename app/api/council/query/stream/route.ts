@@ -114,9 +114,17 @@ export async function POST(request: NextRequest) {
           controller.enqueue(encoder.encode(initEvent));
 
           let fullResponse = "";
+          let stage1Data: any[] = [];
+          let stage2Data: any[] = [];
 
           // Stream the orchestration
           for await (const token of orchestrateCouncilStreaming(councilQuery, {
+            onStage1Complete: (answers) => {
+              stage1Data = answers;
+            },
+            onStage2Complete: (reviews) => {
+              stage2Data = reviews;
+            },
             onStage3Token: (token) => {
               fullResponse += token;
             },
@@ -129,8 +137,13 @@ export async function POST(request: NextRequest) {
             controller.enqueue(encoder.encode(sseData));
           }
 
-          // Send completion event
-          const completeEvent = `data: ${JSON.stringify({ type: 'complete', queryId })}\n\n`;
+          // Send completion event with transcript data
+          const completeEvent = `data: ${JSON.stringify({
+            type: 'complete',
+            queryId,
+            stage1: stage1Data,
+            stage2: stage2Data
+          })}\n\n`;
           controller.enqueue(encoder.encode(completeEvent));
 
           const processingTime = Date.now() - startTime;
