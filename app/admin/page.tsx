@@ -1,31 +1,86 @@
-import React from 'react';
+'use client';
 
-export const metadata = {
-  title: 'Admin Dashboard - LLM Council',
-  description: 'Analytics and monitoring dashboard',
-};
+import React, { useEffect, useState } from 'react';
+
+interface DashboardStats {
+  totalQueries: number;
+  avgProcessingTime: number;
+  avgResponseLength: number;
+  citationsRate: number;
+  domainUsage: Record<string, number>;
+  expertPerformance: Record<string, { avgTime: number; queries: number }>;
+  dailyTrend: number[];
+}
 
 export default function AdminDashboard() {
-  // Placeholder data - will be replaced with real database queries
-  const stats = {
-    totalQueries: 1247,
-    avgProcessingTime: 3.2,
-    avgResponseLength: 1847,
-    citationsRate: 73,
-    domainUsage: {
-      general: 523,
-      healthcare: 412,
-      finance: 312,
-    },
-    expertPerformance: {
-      openai: { avgTime: 2.8, queries: 623 },
-      anthropic: { avgTime: 3.6, queries: 624 },
-    },
-    recentTrends: {
-      dailyQueries: [45, 52, 48, 61, 55, 67, 73],
-      avgRating: 4.2,
-    },
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      const response = await fetch('/api/admin/data/dashboard?days=7');
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch dashboard data');
+      }
+
+      const data = await response.json();
+      setStats({
+        totalQueries: data.totalQueries,
+        avgProcessingTime: data.avgProcessingTime,
+        avgResponseLength: data.avgResponseLength,
+        citationsRate: data.citationsRate,
+        domainUsage: data.domainUsage,
+        expertPerformance: data.expertPerformance,
+        dailyTrend: data.dailyTrend,
+      });
+    } catch (err) {
+      console.error('Failed to fetch dashboard data:', err);
+      setError('Failed to load dashboard data');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !stats) {
+    return (
+      <div className="bg-red-50 border border-red-200 rounded-md p-4">
+        <div className="flex">
+          <div className="flex-shrink-0">
+            <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-red-800">Error Loading Dashboard</h3>
+            <p className="mt-1 text-sm text-red-700">{error || 'Unable to load dashboard data'}</p>
+            <button
+              onClick={fetchDashboardData}
+              className="mt-2 text-sm font-medium text-red-600 hover:text-red-500 underline"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="px-4 py-6 sm:px-0">
@@ -181,7 +236,7 @@ export default function AdminDashboard() {
             </h3>
             <div className="space-y-4">
               {Object.entries(stats.domainUsage).map(([domain, count]) => {
-                const percentage = (count / stats.totalQueries) * 100;
+                const percentage = stats.totalQueries > 0 ? (count / stats.totalQueries) * 100 : 0;
                 return (
                   <div key={domain}>
                     <div className="flex justify-between text-sm mb-1">
@@ -236,9 +291,9 @@ export default function AdminDashboard() {
             Query Volume (Last 7 Days)
           </h3>
           <div className="flex items-end justify-between h-40 gap-2">
-            {stats.recentTrends.dailyQueries.map((count, index) => {
-              const maxCount = Math.max(...stats.recentTrends.dailyQueries);
-              const height = (count / maxCount) * 100;
+            {stats.dailyTrend.map((count, index) => {
+              const maxCount = Math.max(...stats.dailyTrend);
+              const height = maxCount > 0 ? (count / maxCount) * 100 : 0;
               const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
               return (
