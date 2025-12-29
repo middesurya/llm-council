@@ -56,3 +56,7 @@ test_*.ps1
 
 # claude settings (local)
 .claude/settings.local.json
+
+# vector embeddings (generated data)
+.data/
+*.embeddings.json
