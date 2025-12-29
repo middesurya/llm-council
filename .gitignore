@@ -40,8 +40,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# drizzle
+# drizzle (but keep migration SQL files)
 /drizzle
+!drizzle/*.sql
+!/drizzle
 
 # logs
 /logs
