@@ -8,7 +8,14 @@ import { generateWithOpenAI } from "./openai-client";
 import { generateWithAnthropic } from "./anthropic-client";
 import { logWithContext, logStage } from "@/lib/observability";
 import { checkContent } from "@/lib/security/content-filter";
-import { enhanceQueryWithKnowledge } from "@/lib/knowledge";
+import { getKnowledgeContext } from "@/lib/knowledge";
+import {
+  trackQueryAnalytics,
+  trackExpertPerformance,
+  countCitations,
+  countSources,
+  safeTrack,
+} from "@/lib/analytics/tracker";
 
 interface ExpertAnswer {
   provider: string;
@@ -68,7 +75,8 @@ export async function* orchestrateCouncilStreaming(
   }
 
   // Enhance query with domain-specific knowledge (async for semantic search)
-  const enhancedQuery = await enhanceQueryWithKnowledge(councilQuery.query, domain);
+  const knowledgeContext = await getKnowledgeContext(councilQuery.query, domain);
+  const enhancedQuery = knowledgeContext.context || councilQuery.query;
 
   if (enhancedQuery !== councilQuery.query) {
     logWithContext.info('Query enhanced with knowledge context', {
@@ -76,12 +84,16 @@ export async function* orchestrateCouncilStreaming(
       domain,
       originalLength: councilQuery.query.length,
       enhancedLength: enhancedQuery.length,
+      contextLength: knowledgeContext.context?.length || 0,
+      searchMethod: knowledgeContext.searchMethod,
+      sources: knowledgeContext.sources?.length || 0,
     });
   }
 
   let stage1Results: ExpertAnswer[] = [];
   let stage2Results: PeerReview[] = [];
   let hasError = false;
+  const stageTimings = { stage1Start: Date.now(), stage2Start: 0, stage3Start: 0 };
 
   // Process Stages 1 & 2 in background
   const backgroundProcessing = (async () => {
@@ -104,6 +116,18 @@ export async function* orchestrateCouncilStreaming(
           }
 
           logWithContext.info(`${provider} answer received`, { queryId, domain, provider });
+
+          // Track expert performance for Stage 1
+          safeTrack(() => trackExpertPerformance({
+            queryId,
+            provider,
+            model,
+            stage: 'stage1',
+            role: 'primary',
+            answerLength: answer.length,
+            processingTimeMs: Date.now() - stageTimings.stage1Start,
+          }), `Stage 1 streaming tracking for ${provider}`);
+
           return { provider, model, answer };
         } catch (error) {
           logWithContext.error(`${provider} failed in stage1`, error as Error, { queryId, domain, provider });
@@ -181,6 +205,22 @@ export async function* orchestrateCouncilStreaming(
       stage2Results = await Promise.all(stage2Promises);
       stage2Logger.complete(Date.now());
       options.onStage2Complete?.(stage2Results);
+
+      // Track expert performance for Stage 2 (peer reviews)
+      stageTimings.stage2Start = Date.now();
+      safeTrack(() => {
+        Object.entries(supportedProviders).forEach(([provider, model]) => {
+          trackExpertPerformance({
+            queryId,
+            provider,
+            model,
+            stage: 'stage2',
+            role: 'reviewer',
+            answerLength: 0, // Reviews don't have a single answer length
+            processingTimeMs: 0, // Will be approximated
+          });
+        });
+      }, 'Stage 2 streaming tracking');
 
     } catch (error) {
       hasError = true;
@@ -276,6 +316,27 @@ Based on the expert answers and peer reviews, provide a comprehensive final answ
 
     // Ensure background processing completes
     await backgroundProcessing;
+
+    // Track query analytics (Phase 4)
+    const finalSynthesis = stage1Results.map(a => a.answer).join('\n\n');
+    const totalProcessingTime = Date.now() - stageTimings.stage1Start;
+
+    safeTrack(() => trackQueryAnalytics({
+      queryId,
+      domain,
+      queryText: councilQuery.query,
+      originalLength: councilQuery.query.length,
+      enhancedLength: enhancedQuery.length,
+      contextLength: knowledgeContext.context?.length || 0,
+      searchMethod: knowledgeContext.searchMethod as 'keyword' | 'semantic' | 'hybrid' | undefined,
+      semanticSimilarity: knowledgeContext.semanticSimilarity,
+      tokensUsed: 0, // Token usage not tracked in streaming mode
+      processingTimeMs: totalProcessingTime,
+      responseLength: finalSynthesis.length,
+      hasCitations: countCitations(finalSynthesis, domain) > 0 || countCitations(enhancedQuery, domain) > 0,
+      citationCount: countCitations(finalSynthesis, domain),
+      sourceCount: countSources(finalSynthesis) + countSources(enhancedQuery),
+    }), 'Query analytics tracking (streaming)');
 
   } catch (error) {
     logWithContext.error('Stage 3 streaming failed', error as Error, { queryId, domain });
