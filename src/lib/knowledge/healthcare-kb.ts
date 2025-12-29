@@ -258,7 +258,7 @@ export const icd10Codes: MedicalCode[] = [
     code: "G43",
     description: "Migraine",
     category: "Nervous System",
-    keywords: ["migraine", "migraine headache", "vascular headache"]
+    keywords: ["migraine", "migraine headache", "vascular headache", "severe headache", "throbbing headache", "headaches", "one-sided headache"]
   },
   {
     code: "G44",
@@ -360,7 +360,31 @@ export const icd10Codes: MedicalCode[] = [
     code: "R11",
     description: "Nausea and vomiting",
     category: "Symptoms",
-    keywords: ["nausea", "vomiting", "throwing up", "emesis"]
+    keywords: ["nausea", "vomiting", "throwing up", "emesis", "queasy", "nauseous"]
+  },
+  {
+    code: "R35",
+    description: "Polyuria",
+    category: "Symptoms",
+    keywords: ["frequent urination", "excessive urination", "polyuria", "peeing often", "increased urination", "urinating frequently"]
+  },
+  {
+    code: "R63.1",
+    description: "Polydipsia",
+    category: "Symptoms",
+    keywords: ["excessive thirst", "increased thirst", "polydipsia", "very thirsty", "drinking a lot", "always thirsty"]
+  },
+  {
+    code: "R63.2",
+    description: "Polyphagia",
+    category: "Symptoms",
+    keywords: ["excessive hunger", "increased hunger", "polyphagia", "always hungry", "eating a lot", "increased appetite"]
+  },
+  {
+    code: "R63.4",
+    description: "Abnormal weight loss",
+    category: "Symptoms",
+    keywords: ["weight loss", "losing weight", "unexplained weight loss", "unintentional weight loss"]
   },
   {
     code: "R13",
@@ -385,6 +409,12 @@ export const icd10Codes: MedicalCode[] = [
     description: "Signs and symptoms",
     category: "Symptoms",
     keywords: ["fatigue", "weakness", "malaise", "tiredness"]
+  },
+  {
+    code: "H53",
+    description: "Visual disturbances",
+    category: "Symptoms",
+    keywords: ["blurred vision", "vision changes", "visual disturbance", "blurry vision", "double vision", "vision problems", "eye problems", "seeing spots"]
   },
   {
     code: "Z00",
