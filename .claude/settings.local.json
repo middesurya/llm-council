@@ -33,7 +33,10 @@
       "Bash(cat:*)",
       "Bash(git pull:*)",
       "Bash(printf '\\\\n')",
-      "Bash(npm run db:migrate:*)"
+      "Bash(npm run db:migrate:*)",
+      "Bash(where:*)",
+      "Bash(docker:*)",
+      "Bash(ping:*)"
     ]
   }
 }

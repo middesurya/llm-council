@@ -28,9 +28,10 @@ CREATE TABLE IF NOT EXISTS error_logs (
 );
 
 -- User feedback
+-- Note: query_id is TEXT (business identifier), not a foreign key to allow flexibility
 CREATE TABLE IF NOT EXISTS feedback (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  query_id TEXT NOT NULL REFERENCES council_responses(query_id),
+  query_id TEXT NOT NULL,
   rating INTEGER NOT NULL,
   category TEXT,
   comment TEXT,

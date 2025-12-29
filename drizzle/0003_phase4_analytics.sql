@@ -82,12 +82,12 @@ CREATE INDEX IF NOT EXISTS "idx_feedback_analytics_rating" ON "feedback_analytic
 CREATE INDEX IF NOT EXISTS "idx_feedback_analytics_timestamp" ON "feedback_analytics"("timestamp");
 
 -- Add comments for documentation
-COMMENT ON TABLE "query_analytics" IS 'Detailed metrics for each query processed by the council';
-COMMENT ON TABLE "expert_performance" IS 'Individual expert (LLM) performance tracking per query';
-COMMENT ON TABLE "domain_usage" IS 'Aggregated domain usage statistics by date';
-COMMENT ON TABLE "feedback_analytics" IS 'Enhanced feedback tracking with domain context';
+COMMENT ON TABLE query_analytics IS 'Detailed metrics for each query processed by the council';
+COMMENT ON TABLE expert_performance IS 'Individual expert (LLM) performance tracking per query';
+COMMENT ON TABLE domain_usage IS 'Aggregated domain usage statistics by date';
+COMMENT ON TABLE feedback_analytics IS 'Enhanced feedback tracking with domain context';
 
-COMMENT ON COLUMN "query_analytics.search_method" IS 'keyword, semantic, or hybrid search';
-COMMENT ON COLUMN "query_analytics.semantic_similarity" IS 'Similarity score 0-100 from semantic search';
-COMMENT ON COLUMN "expert_performance.ranking" IS 'Peer review ranking (1 or 2)';
-COMMENT ON COLUMN "domain_usage.date" IS 'Date truncated (no time component)';
+COMMENT ON COLUMN query_analytics.search_method IS 'keyword, semantic, or hybrid search';
+COMMENT ON COLUMN query_analytics.semantic_similarity IS 'Similarity score 0-100 from semantic search';
+COMMENT ON COLUMN expert_performance.ranking IS 'Peer review ranking (1 or 2)';
+COMMENT ON COLUMN domain_usage.date IS 'Date truncated (no time component)';

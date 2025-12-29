@@ -27,7 +27,7 @@ async function runMigrations() {
 
     // Get list of migration files
     const migrationFiles = [
-      '0001_initial.sql',
+      '0000_easy_stick.sql',
       '0002_observability.sql',
       '0003_phase4_analytics.sql'
     ];
