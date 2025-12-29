@@ -5,7 +5,14 @@ import { generateWithClient } from "./index";
 import { logWithContext, logStage } from "@/lib/observability";
 import { metricsCollector } from "@/lib/observability";
 import { trackProviderError, ErrorCategory } from "@/lib/observability";
-import { enhanceQueryWithKnowledge } from "@/lib/knowledge";
+import { enhanceQueryWithKnowledge, getKnowledgeContext } from "@/lib/knowledge";
+import {
+  trackQueryAnalytics,
+  trackExpertPerformance,
+  countCitations,
+  countSources,
+  safeTrack,
+} from "@/lib/analytics/tracker";
 
 export interface ExpertAnswer {
   provider: string;
@@ -84,7 +91,11 @@ export async function orchestrateCouncil(councilQuery: CouncilQuery): Promise<Co
   const providerSuccess: Record<string, boolean> = {};
 
   // Enhance query with domain-specific knowledge (async for semantic search)
-  const enhancedQuery = await enhanceQueryWithKnowledge(councilQuery.query, councilQuery.domain || "general");
+  const knowledgeContext = await getKnowledgeContext(
+    councilQuery.query,
+    councilQuery.domain || "general"
+  );
+  const enhancedQuery = knowledgeContext.context || councilQuery.query;
 
   if (enhancedQuery !== councilQuery.query) {
     logWithContext.info('Query enhanced with knowledge context', {
@@ -92,6 +103,9 @@ export async function orchestrateCouncil(councilQuery: CouncilQuery): Promise<Co
       domain,
       originalLength: councilQuery.query.length,
       enhancedLength: enhancedQuery.length,
+      contextLength: knowledgeContext.context?.length || 0,
+      searchMethod: knowledgeContext.searchMethod,
+      sources: knowledgeContext.sources?.length || 0,
     });
   }
 
@@ -123,6 +137,17 @@ export async function orchestrateCouncil(councilQuery: CouncilQuery): Promise<Co
         provider,
         answerLength: answer.length
       });
+
+      // Track expert performance for Stage 1
+      safeTrack(() => trackExpertPerformance({
+        queryId,
+        provider,
+        model,
+        stage: 'stage1',
+        role: 'primary',
+        answerLength: answer.length,
+        processingTimeMs: Date.now() - timings.stage1Start,
+      }), `Stage 1 tracking for ${provider}`);
 
       return { provider, model, answer, success: true, tokensUsed: estimatedTokens };
     } catch (error) {
@@ -219,6 +244,17 @@ Respond in this exact JSON format:
         Math.ceil(reviewResponse.length / 4)
       );
 
+      // Track expert performance for Stage 2 (peer review)
+      safeTrack(() => trackExpertPerformance({
+        queryId,
+        provider: reviewerProvider,
+        model: reviewerModel,
+        stage: 'stage2',
+        role: 'reviewer',
+        answerLength: reviewResponse.length,
+        processingTimeMs: Date.now() - timings.stage2Start,
+      }), `Stage 2 tracking for ${reviewerProvider}`);
+
       return reviewData.rankings.map((r: any) => ({
         reviewerProvider,
         reviewerModel,
@@ -312,6 +348,17 @@ Provide the final synthesis answer:`;
     Math.ceil(synthesis.length / 4)
   );
 
+  // Track expert performance for Stage 3 (synthesis)
+  safeTrack(() => trackExpertPerformance({
+    queryId,
+    provider: bestProvider,
+    model: bestAnswer.model,
+    stage: 'stage3',
+    role: 'primary',
+    answerLength: synthesis.length,
+    processingTimeMs: Date.now() - timings.stage3Start,
+  }), `Stage 3 tracking for ${bestProvider}`);
+
   timings.stage3End = Date.now();
   const stage3Duration = timings.stage3End - timings.stage3Start;
   metricsCollector.recordStage(queryId, 'stage3', stage3Duration);
@@ -336,6 +383,24 @@ Provide the final synthesis answer:`;
     stage3Duration,
     synthesizer: bestProvider,
   });
+
+  // Track query analytics (Phase 4)
+  safeTrack(() => trackQueryAnalytics({
+    queryId,
+    domain,
+    queryText: councilQuery.query,
+    originalLength: councilQuery.query.length,
+    enhancedLength: enhancedQuery.length,
+    contextLength: knowledgeContext.context?.length || 0,
+    searchMethod: knowledgeContext.searchMethod as 'keyword' | 'semantic' | 'hybrid' | undefined,
+    semanticSimilarity: knowledgeContext.semanticSimilarity,
+    tokensUsed: finalMetrics?.tokenUsage ? Object.values(finalMetrics.tokenUsage).reduce((a: number, b: number) => a + b, 0) : 0,
+    processingTimeMs: totalDuration,
+    responseLength: synthesis.length,
+    hasCitations: countCitations(synthesis, domain) > 0 || countCitations(enhancedQuery, domain) > 0,
+    citationCount: countCitations(synthesis, domain),
+    sourceCount: countSources(synthesis) + countSources(enhancedQuery),
+  }), 'Query analytics tracking');
 
   return {
     queryId,

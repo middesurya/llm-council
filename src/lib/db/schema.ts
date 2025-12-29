@@ -50,3 +50,62 @@ export const feedback = pgTable("feedback", {
   comment: text("comment"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
+
+// Phase 4: Detailed query analytics
+export const queryAnalytics = pgTable("query_analytics", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  queryId: text("query_id").notNull().unique(),
+  domain: text("domain").notNull(),
+  queryText: text("query_text").notNull(),
+  originalLength: integer("original_length").notNull(),
+  enhancedLength: integer("enhanced_length").notNull(),
+  contextLength: integer("context_length"),
+  searchMethod: text("search_method"), // 'keyword', 'semantic', 'hybrid'
+  semanticSimilarity: integer("semantic_similarity"), // 0-100 scaled
+  tokensUsed: integer("tokens_used"),
+  processingTimeMs: integer("processing_time_ms").notNull(),
+  responseLength: integer("response_length").notNull(),
+  hasCitations: integer("has_citations").notNull(), // 0 or 1
+  citationCount: integer("citation_count").notNull(),
+  sourceCount: integer("source_count").notNull(),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+// Phase 4: Expert performance tracking
+export const expertPerformance = pgTable("expert_performance", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  queryId: text("query_id").notNull(),
+  provider: text("provider").notNull(), // 'openai', 'anthropic', 'google'
+  model: text("model").notNull(),
+  stage: text("stage").notNull(), // 'stage1', 'stage2', 'stage3'
+  role: text("role"), // 'primary' or 'reviewer'
+  ranking: integer("ranking"), // 1 or 2
+  reasoning: text("reasoning"),
+  answerLength: integer("answer_length").notNull(),
+  processingTimeMs: integer("processing_time_ms").notNull(),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});
+
+// Phase 4: Domain usage statistics (materialized view or table)
+export const domainUsage = pgTable("domain_usage", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  domain: text("domain").notNull(),
+  date: timestamp("date").notNull(), // Date without time
+  queryCount: integer("query_count").notNull().default(0),
+  avgProcessingTime: integer("avg_processing_time"),
+  avgResponseLength: integer("avg_response_length"),
+  citationsPerQuery: integer("citations_per_query"),
+  uniqueUsers: integer("unique_users"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Phase 4: Feedback analytics for detailed analysis
+export const feedbackAnalytics = pgTable("feedback_analytics", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  queryId: text("query_id").notNull(),
+  rating: integer("rating").notNull(), // 1-5
+  category: text("category"), // 'helpful', 'inaccurate', 'incomplete', 'confusing', 'other'
+  comment: text("comment"),
+  domain: text("domain"), // Denormalized for faster queries
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+});

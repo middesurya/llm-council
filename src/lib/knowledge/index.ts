@@ -12,6 +12,7 @@ export interface KnowledgeEnhancement {
   context: string;
   sources: string[];
   searchMethod: 'keyword' | 'semantic' | 'hybrid';
+  semanticSimilarity?: number; // 0-100 scaled similarity score
 }
 
 /**
@@ -20,7 +21,7 @@ export interface KnowledgeEnhancement {
 async function getSemanticContext(
   query: string,
   domain: string
-): Promise<string> {
+): Promise<{ context: string; avgSimilarity: number }> {
   try {
     await vectorStore.initialize();
 
@@ -31,13 +32,17 @@ async function getSemanticContext(
     });
 
     if (results.length === 0) {
-      return '';
+      return { context: '', avgSimilarity: 0 };
     }
 
-    return vectorStore.formatSearchResults(results);
+    // Calculate average similarity (scaled to 0-100)
+    const avgSimilarity = (results.reduce((sum, r) => sum + r.similarity, 0) / results.length) * 100;
+    const context = vectorStore.formatSearchResults(results);
+
+    return { context, avgSimilarity };
   } catch (error) {
     console.error('[KnowledgeService] Semantic search failed:', error);
-    return '';
+    return { context: '', avgSimilarity: 0 };
   }
 }
 
@@ -58,14 +63,16 @@ export async function getKnowledgeContext(
 
   let context = "";
   let searchMethod: KnowledgeEnhancement['searchMethod'] = 'keyword';
+  let semanticSimilarity: number | undefined;
   const sources: string[] = [];
 
   // Try semantic search first (if enabled and available)
   if (preferSemantic) {
     try {
-      const semanticContext = await getSemanticContext(query, domain);
-      if (semanticContext.trim()) {
-        context = semanticContext;
+      const semanticResult = await getSemanticContext(query, domain);
+      if (semanticResult.context.trim()) {
+        context = semanticResult.context;
+        semanticSimilarity = semanticResult.avgSimilarity;
         searchMethod = 'semantic';
         sources.push("Vector Semantic Search");
       }
@@ -94,6 +101,7 @@ export async function getKnowledgeContext(
     context: context.trim(),
     sources,
     searchMethod,
+    semanticSimilarity,
   };
 }
 
