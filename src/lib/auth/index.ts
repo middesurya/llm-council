@@ -42,7 +42,7 @@ export async function createAdminSession(): Promise<void> {
     name: AUTH_CONFIG.cookieName,
     value: JSON.stringify(session),
     httpOnly: true,
-    path: '/admin',
+    path: '/', // Use root path so cookie is sent to API routes too
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     maxAge: AUTH_CONFIG.sessionDuration / 1000, // Convert to seconds
@@ -57,7 +57,7 @@ export async function clearAdminSession(): Promise<void> {
 
   cookieStore.delete({
     name: AUTH_CONFIG.cookieName,
-    path: '/admin',
+    path: '/', // Use root path to match the session cookie
   });
 }
 

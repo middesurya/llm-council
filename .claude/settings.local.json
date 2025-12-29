@@ -36,7 +36,8 @@
       "Bash(npm run db:migrate:*)",
       "Bash(where:*)",
       "Bash(docker:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(del \"C:\\\\Users\\\\surya\\\\OneDrive\\\\Desktop\\\\work\\\\projects\\\\personal_proj\\\\llm_council\\\\test_login.ps1\")"
     ]
   }
 }
