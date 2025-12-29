@@ -208,18 +208,20 @@ export async function* orchestrateCouncilStreaming(
 
       // Track expert performance for Stage 2 (peer reviews)
       stageTimings.stage2Start = Date.now();
-      safeTrack(() => {
-        Object.entries(supportedProviders).forEach(([provider, model]) => {
-          trackExpertPerformance({
-            queryId,
-            provider,
-            model,
-            stage: 'stage2',
-            role: 'reviewer',
-            answerLength: 0, // Reviews don't have a single answer length
-            processingTimeMs: 0, // Will be approximated
-          });
-        });
+      safeTrack(async () => {
+        await Promise.all(
+          Object.entries(supportedProviders).map(([provider, model]) =>
+            trackExpertPerformance({
+              queryId,
+              provider,
+              model,
+              stage: 'stage2',
+              role: 'reviewer',
+              answerLength: 0, // Reviews don't have a single answer length
+              processingTimeMs: 0, // Will be approximated
+            })
+          )
+        );
       }, 'Stage 2 streaming tracking');
 
     } catch (error) {
