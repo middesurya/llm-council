@@ -27,7 +27,11 @@
       "Bash(ls:*)",
       "Bash(Source: https://...\"\n\nDomain Prompt Enhancements:\n- Healthcare: Add instruction to cite sources when provided\n- Healthcare: Add \"Sources\" section to required response format\n- Finance: Add instruction to cite sources when provided\n- Finance: Add \"Sources\" section to required response format\n- Both: Include example source citations in example responses\n\nBenefits:\n- Users can verify information from official sources\n- Improves trust and transparency\n- Enables audit trail for knowledge\n- Foundation for knowledge versioning\n\nThis completes Phase 3.7 - Knowledge Provenance Tracking, ensuring\nall knowledge can be traced to authoritative sources.\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
       "Bash(curl:*)",
-      "Bash(tail:*)"
+      "Bash(tail:*)",
+      "Bash(git checkout:*)",
+      "Bash(git stash:*)",
+      "Bash(cat:*)",
+      "Bash(git pull:*)"
     ]
   }
 }
