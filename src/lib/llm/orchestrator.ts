@@ -83,8 +83,8 @@ export async function orchestrateCouncil(councilQuery: CouncilQuery): Promise<Co
   // Track provider success
   const providerSuccess: Record<string, boolean> = {};
 
-  // Enhance query with domain-specific knowledge
-  const enhancedQuery = enhanceQueryWithKnowledge(councilQuery.query, councilQuery.domain || "general");
+  // Enhance query with domain-specific knowledge (async for semantic search)
+  const enhancedQuery = await enhanceQueryWithKnowledge(councilQuery.query, councilQuery.domain || "general");
 
   if (enhancedQuery !== councilQuery.query) {
     logWithContext.info('Query enhanced with knowledge context', {

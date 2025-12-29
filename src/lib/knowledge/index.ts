@@ -1,55 +1,138 @@
 /**
  * Knowledge Service
  * Provides domain-specific context and knowledge retrieval for enhanced LLM responses
+ * Now with vector semantic search!
  */
 
 import { getMedicalContext } from "./healthcare-kb";
 import { getFinancialContext } from "./finance-kb";
+import { vectorStore } from "./vector-store";
 
 export interface KnowledgeEnhancement {
   context: string;
   sources: string[];
+  searchMethod: 'keyword' | 'semantic' | 'hybrid';
+}
+
+/**
+ * Retrieve relevant knowledge context using semantic search
+ */
+async function getSemanticContext(
+  query: string,
+  domain: string
+): Promise<string> {
+  try {
+    await vectorStore.initialize();
+
+    const results = await vectorStore.search(query, {
+      limit: 5,
+      minSimilarity: 0.7,
+      domain: domain.toLowerCase(),
+    });
+
+    if (results.length === 0) {
+      return '';
+    }
+
+    return vectorStore.formatSearchResults(results);
+  } catch (error) {
+    console.error('[KnowledgeService] Semantic search failed:', error);
+    return '';
+  }
 }
 
 /**
  * Retrieve relevant knowledge context based on domain and query
+ * Hybrid approach: Uses semantic search first, falls back to keyword matching
  */
-export function getKnowledgeContext(
+export async function getKnowledgeContext(
   query: string,
-  domain: string
-): KnowledgeEnhancement {
+  domain: string,
+  options: {
+    preferSemantic?: boolean;
+  } = {}
+): Promise<KnowledgeEnhancement> {
   const lowerQuery = query.toLowerCase();
   const lowerDomain = domain.toLowerCase();
+  const { preferSemantic = true } = options;
 
   let context = "";
+  let searchMethod: KnowledgeEnhancement['searchMethod'] = 'keyword';
   const sources: string[] = [];
 
-  if (lowerDomain === "healthcare") {
-    context = getMedicalContext(query);
-    if (context.trim()) {
-      sources.push("ICD-10 Codes", "Medical Reference Database");
+  // Try semantic search first (if enabled and available)
+  if (preferSemantic) {
+    try {
+      const semanticContext = await getSemanticContext(query, domain);
+      if (semanticContext.trim()) {
+        context = semanticContext;
+        searchMethod = 'semantic';
+        sources.push("Vector Semantic Search");
+      }
+    } catch (error) {
+      console.warn('[KnowledgeService] Semantic search unavailable, using keywords');
     }
-  } else if (lowerDomain === "finance") {
-    context = getFinancialContext(query);
-    if (context.trim()) {
-      sources.push("GAAP Standards", "IFRS Standards", "Financial Reference Database");
+  }
+
+  // Fall back to keyword search if semantic search didn't find anything
+  if (!context) {
+    if (lowerDomain === "healthcare") {
+      context = getMedicalContext(query);
+      if (context.trim()) {
+        sources.push("ICD-10 Codes", "Medical Reference Database");
+      }
+    } else if (lowerDomain === "finance") {
+      context = getFinancialContext(query);
+      if (context.trim()) {
+        sources.push("GAAP Standards", "IFRS Standards", "Financial Reference Database");
+      }
     }
+    searchMethod = 'keyword';
   }
 
   return {
     context: context.trim(),
     sources,
+    searchMethod,
   };
 }
 
 /**
- * Enhance a query with relevant knowledge context
+ * Enhance a query with relevant knowledge context (async version with semantic search)
  */
-export function enhanceQueryWithKnowledge(
+export async function enhanceQueryWithKnowledge(
+  query: string,
+  domain: string,
+  options?: {
+    preferSemantic?: boolean;
+  }
+): Promise<string> {
+  const { context } = await getKnowledgeContext(query, domain, options);
+
+  if (!context) {
+    return query;
+  }
+
+  return `${query}\n\n=== RELEVANT KNOWLEDGE CONTEXT ===${context}\n=== END KNOWLEDGE CONTEXT ===`;
+}
+
+/**
+ * Synchronous version for backward compatibility (keyword-only)
+ */
+export function enhanceQueryWithKnowledgeSync(
   query: string,
   domain: string
 ): string {
-  const { context } = getKnowledgeContext(query, domain);
+  const lowerQuery = query.toLowerCase();
+  const lowerDomain = domain.toLowerCase();
+
+  let context = "";
+
+  if (lowerDomain === "healthcare") {
+    context = getMedicalContext(query);
+  } else if (lowerDomain === "finance") {
+    context = getFinancialContext(query);
+  }
 
   if (!context) {
     return query;

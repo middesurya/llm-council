@@ -67,8 +67,8 @@ export async function* orchestrateCouncilStreaming(
     return;
   }
 
-  // Enhance query with domain-specific knowledge
-  const enhancedQuery = enhanceQueryWithKnowledge(councilQuery.query, domain);
+  // Enhance query with domain-specific knowledge (async for semantic search)
+  const enhancedQuery = await enhanceQueryWithKnowledge(councilQuery.query, domain);
 
   if (enhancedQuery !== councilQuery.query) {
     logWithContext.info('Query enhanced with knowledge context', {
