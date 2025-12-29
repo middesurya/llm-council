@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/auth';
-import { db } from '@/lib/db';
+import { getDb } from '@/lib/db';
 import { queryAnalytics, expertPerformance } from '@/lib/db/schema';
 import { sql, desc, count, avg } from 'drizzle-orm';
 
@@ -8,6 +8,15 @@ export async function GET(request: NextRequest) {
   try {
     // Require authentication
     await requireAdminAuth();
+
+    // Get database connection
+    const db = await getDb();
+    if (!db) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 500 }
+      );
+    }
 
     // Get query parameters for filtering
     const searchParams = request.nextUrl.searchParams;

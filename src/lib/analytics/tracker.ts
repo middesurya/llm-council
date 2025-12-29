@@ -4,7 +4,7 @@
  * Records query metrics, expert performance, and usage statistics
  */
 
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { queryAnalytics, expertPerformance } from "@/lib/db/schema";
 
 export interface QueryAnalyticsData {
@@ -41,6 +41,11 @@ export interface ExpertPerformanceData {
  */
 export async function trackQueryAnalytics(data: QueryAnalyticsData): Promise<void> {
   try {
+    const db = await getDb();
+    if (!db) {
+      console.warn('[Analytics] Database not available, skipping query analytics tracking');
+      return;
+    }
     await db.insert(queryAnalytics).values({
       queryId: data.queryId,
       domain: data.domain,
@@ -69,6 +74,11 @@ export async function trackQueryAnalytics(data: QueryAnalyticsData): Promise<voi
  */
 export async function trackExpertPerformance(data: ExpertPerformanceData): Promise<void> {
   try {
+    const db = await getDb();
+    if (!db) {
+      console.warn('[Analytics] Database not available, skipping expert performance tracking');
+      return;
+    }
     await db.insert(expertPerformance).values({
       queryId: data.queryId,
       provider: data.provider,
