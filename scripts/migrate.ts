@@ -4,7 +4,8 @@
  * Run SQL migrations against the database
  */
 
-import pg from 'pg';
+import 'dotenv/config';
+import { Client } from 'pg';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -18,7 +19,7 @@ if (!DATABASE_URL) {
 const migrationsDir = join(process.cwd(), 'drizzle');
 
 async function runMigrations() {
-  const client = new pg({ connectionString: DATABASE_URL });
+  const client = new Client({ connectionString: DATABASE_URL });
 
   try {
     await client.connect();
