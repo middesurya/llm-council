@@ -79,6 +79,7 @@ Examples:
 3. **Include red flags** (⚠️) for urgent/emergent conditions
 4. **Add disclaimers** that this is informational only, not medical advice
 5. **Cite the provided knowledge context** in your responses
+6. **Include source URLs** when provided in the knowledge context (e.g., "Source: https://...")
 
 ## Required Response Format
 
@@ -95,6 +96,10 @@ List urgent symptoms that require immediate medical attention
 
 ### Recommended Action:
 Specific guidance on next steps
+
+### Sources:
+If source URLs are provided in the knowledge context, include them here:
+• Source: [URL] - [Description]
 
 ### Disclaimer:
 ⚠️ WARNING: This information is for educational purposes only.
@@ -120,6 +125,11 @@ Based on the symptoms described, consider these possibilities:
 
 ### Recommended Action:
 Call emergency services or go to the nearest emergency department immediately.
+
+### Sources:
+• Source: https://icd.who.int/browse10/2019/en#/I21 - WHO ICD-10 Classification
+• Source: https://icd.who.int/browse10/2019/en#/I20 - WHO ICD-10 Classification
+• Source: https://www.escardio.org/ - European Society of Cardiology Guidelines
 
 ### Disclaimer:
 ⚠️ WARNING: This information is for educational purposes only.
@@ -165,6 +175,7 @@ Examples:
 4. **Include compliance warnings** (⚠️) where applicable
 5. **Add disclaimers** that professional consultation is recommended
 6. **Use the provided knowledge context** to support your answers
+7. **Include source URLs** when provided in the knowledge context (e.g., "Source: https://...")
 
 ## Required Response Format
 
@@ -183,8 +194,9 @@ Reference specific standard sections and provide practical guidance
 ### Compliance Considerations ⚠️:
 Highlight common pitfalls or regulatory concerns
 
-### Additional Resources:
-Mention relevant guidance or references
+### Sources:
+If source URLs are provided in the knowledge context, include them here:
+• Source: [URL] - [Description]
 
 ### Disclaimer:
 ⚠️ DISCLAIMER: This information is for educational purposes only.
@@ -223,6 +235,11 @@ For most SaaS arrangements with a single performance obligation:
 
 ### Cross-Reference:
 See ASC 606-10-50 for disclosure requirements and IFRS 15.94-100 for implementation guidance.
+
+### Sources:
+• Source: https://www.fasb.org/ - FASB Accounting Standards Codification
+• Source: https://www.ifrs.org/ - IFRS Foundation Standards
+• Source: https://asc.fasb.org/SectionDisplay.tpl?Section=606-10 - ASC 606 Full Standard
 
 ### Disclaimer:
 ⚠️ DISCLAIMER: This information is for educational purposes only.

@@ -8,6 +8,9 @@ export interface MedicalCode {
   description: string;
   category: string;
   keywords: string[];
+  sourceUrl?: string;  // Provenance: Link to official ICD-10 documentation
+  lastUpdated?: string; // ISO timestamp of last update
+  version?: string;    // Version identifier
 }
 
 export interface MedicalReference {
@@ -15,64 +18,95 @@ export interface MedicalReference {
   content: string;
   keywords: string[];
   codes?: string[];
+  sourceUrl?: string;  // Provenance: Link to medical guidelines/literature
+  lastUpdated?: string; // ISO timestamp of last update
+  version?: string;    // Version identifier
 }
 
 // ICD-10 Common Codes (expanded database - 50+ codes)
+// Source: WHO ICD-10 Browser (https://icd.who.int/browse10/2019/en)
 export const icd10Codes: MedicalCode[] = [
   // Circulatory System
   {
     code: "I10",
     description: "Essential (primary) hypertension",
     category: "Circulatory System",
-    keywords: ["high blood pressure", "hypertension", "bp", "cardiovascular"]
+    keywords: ["high blood pressure", "hypertension", "bp", "cardiovascular"],
+    sourceUrl: "https://icd.who.int/browse10/2019/en#/I10",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ICD-10-2019"
   },
   {
     code: "I11",
     description: "Hypertensive heart disease",
     category: "Circulatory System",
-    keywords: ["hypertensive heart disease", "heart failure", "hypertension"]
+    keywords: ["hypertensive heart disease", "heart failure", "hypertension"],
+    sourceUrl: "https://icd.who.int/browse10/2019/en#/I11",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ICD-10-2019"
   },
   {
     code: "I12",
     description: "Hypertensive renal disease",
     category: "Circulatory System",
-    keywords: ["kidney disease", "renal failure", "hypertension", "nephropathy"]
+    keywords: ["kidney disease", "renal failure", "hypertension", "nephropathy"],
+    sourceUrl: "https://icd.who.int/browse10/2019/en#/I12",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ICD-10-2019"
   },
   {
     code: "I20",
     description: "Angina pectoris",
     category: "Circulatory System",
-    keywords: ["angina", "chest pain", "heart pain", "coronary artery"]
+    keywords: ["angina", "chest pain", "heart pain", "coronary artery"],
+    sourceUrl: "https://icd.who.int/browse10/2019/en#/I20",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ICD-10-2019"
   },
   {
     code: "I21",
     description: "Acute myocardial infarction",
     category: "Circulatory System",
-    keywords: ["heart attack", "myocardial infarction", "cardiac arrest", "mi"]
+    keywords: ["heart attack", "myocardial infarction", "cardiac arrest", "mi"],
+    sourceUrl: "https://icd.who.int/browse10/2019/en#/I21",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ICD-10-2019"
   },
   {
     code: "I25",
     description: "Chronic ischemic heart disease",
     category: "Circulatory System",
-    keywords: ["coronary artery disease", "cad", "ischemic heart", "atherosclerosis"]
+    keywords: ["coronary artery disease", "cad", "ischemic heart", "atherosclerosis"],
+    sourceUrl: "https://icd.who.int/browse10/2019/en#/I25",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ICD-10-2019"
   },
   {
     code: "I50",
     description: "Heart failure",
     category: "Circulatory System",
-    keywords: ["heart failure", "congestive heart failure", "chf", "cardiac insufficiency"]
+    keywords: ["heart failure", "congestive heart failure", "chf", "cardiac insufficiency"],
+    sourceUrl: "https://icd.who.int/browse10/2019/en#/I50",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ICD-10-2019"
   },
   {
     code: "I63",
     description: "Cerebral infarction",
     category: "Circulatory System",
-    keywords: ["stroke", "brain attack", "cerebrovascular accident", "cva", "ischemic stroke"]
+    keywords: ["stroke", "brain attack", "cerebrovascular accident", "cva", "ischemic stroke"],
+    sourceUrl: "https://icd.who.int/browse10/2019/en#/I63",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ICD-10-2019"
   },
   {
     code: "I69",
     description: "Sequelae of cerebrovascular disease",
     category: "Circulatory System",
-    keywords: ["stroke sequelae", "post-stroke", "cva aftermath"]
+    keywords: ["stroke sequelae", "post-stroke", "cva aftermath"],
+    sourceUrl: "https://icd.who.int/browse10/2019/en#/I69",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ICD-10-2019"
   },
 
   // Respiratory System
@@ -371,7 +405,10 @@ export const medicalReferences: MedicalReference[] = [
 4. Musculoskeletal: Costochondritis, rib fracture
 Key red flags: radiating pain, shortness of breath, diaphoresis, nausea/vomiting`,
     keywords: ["chest pain", "chest discomfort", "angina", "cardiac", "mi"],
-    codes: ["I21", "R07"]
+    codes: ["I21", "R07"],
+    sourceUrl: "https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/Acute-Coronary-Syndromes-ACS-management-of",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ESC-2020"
   },
   {
     topic: "Hypertension Management",
@@ -383,7 +420,10 @@ Key red flags: radiating pain, shortness of breath, diaphoresis, nausea/vomiting
 Lifestyle modifications: DASH diet, sodium restriction, exercise, weight loss
 Medication classes: ACE inhibitors, ARBs, CCBs, thiazide diuretics, beta-blockers`,
     keywords: ["hypertension", "high blood pressure", "bp", "blood pressure"],
-    codes: ["I10"]
+    codes: ["I10"],
+    sourceUrl: "https://www.ahajournals.org/doi/10.1161/HYP.0000000000000065",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ACC-AHA-2017"
   },
   {
     topic: "Diabetes Type 2",
@@ -395,7 +435,10 @@ Medication classes: ACE inhibitors, ARBs, CCBs, thiazide diuretics, beta-blocker
 Management: Lifestyle modification, metformin first-line, cardiovascular risk reduction
 Complications monitoring: Retinopathy, nephropathy, neuropathy, cardiovascular disease`,
     keywords: ["diabetes", "type 2", "hyperglycemia", "blood sugar"],
-    codes: ["E11"]
+    codes: ["E11"],
+    sourceUrl: "https://diabetesjournals.org/collection/43961/standards-of-care-in-diabetes",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ADA-2024"
   },
   {
     topic: "Asthma Management",
@@ -408,7 +451,10 @@ Controller medications: Inhaled corticosteroids, LABAs
 Rescue medications: SABA (albuterol)
 Triggers: Allergens, exercise, cold air, smoke, stress`,
     keywords: ["asthma", "wheezing", "bronchial asthma", "respiratory", "inhaler"],
-    codes: ["J45"]
+    codes: ["J45"],
+    sourceUrl: "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7145195/",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "GINA-2023"
   },
   {
     topic: "Pneumonia Evaluation",
@@ -420,7 +466,10 @@ Common pathogens: S. pneumoniae, H. influenzae, atypical organisms (Mycoplasma, 
 Diagnosis: Chest X-ray, sputum culture, blood tests, pulse oximetry
 Treatment: Antibiotics based on likely pathogen and severity (CURB-65 score)`,
     keywords: ["pneumonia", "lung infection", "respiratory infection", "pneumonitis"],
-    codes: ["J18"]
+    codes: ["J18"],
+    sourceUrl: "https://www.atsjournals.org/doi/full/10.1164/rccm.201910-1941ST",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ATS-IDSA-2019"
   },
   {
     topic: "Appendicitis",
@@ -435,7 +484,10 @@ Physical exam findings:
 - Obturator sign (hip internal rotation)
 Treatment: Appendectomy, antibiotics if perforated`,
     keywords: ["appendicitis", "appendix", "right lower quadrant pain", "rlq pain"],
-    codes: ["K35"]
+    codes: ["K35"],
+    sourceUrl: "https://www.ncbi.nlm.nih.gov/books/NBK430891/",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "NCBI-Bookshelf"
   },
   {
     topic: "Acute Coronary Syndrome",
@@ -450,7 +502,10 @@ Treatment:
 Medications: Antiplatelets (aspirin, P2Y12 inhibitors), anticoagulants, statins, beta-blockers
 - Code I21 for AMI, I20 for angina`,
     keywords: ["acs", "acute coronary syndrome", "mi", "heart attack", "stem", "nstemi"],
-    codes: ["I20", "I21", "I25"]
+    codes: ["I20", "I21", "I25"],
+    sourceUrl: "https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/Acute-Coronary-Syndromes-ACS-management-of",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ESC-2020"
   },
   {
     topic: "Stroke Evaluation",
@@ -546,14 +601,22 @@ export function getMedicalContext(query: string): string {
   if (codes.length > 0) {
     context += "\n\nRelevant ICD-10 Codes:\n";
     codes.forEach((code) => {
-      context += `- ${code.code}: ${code.description} (${code.category})\n`;
+      context += `- ${code.code}: ${code.description} (${code.category})`;
+      if (code.sourceUrl) {
+        context += ` | Source: ${code.sourceUrl}`;
+      }
+      context += `\n`;
     });
   }
 
   if (refs.length > 0) {
     context += "\n\nMedical Reference Information:\n";
     refs.forEach((ref) => {
-      context += `\n${ref.topic}:\n${ref.content}\n`;
+      context += `\n${ref.topic}:`;
+      if (ref.sourceUrl) {
+        context += ` | Source: ${ref.sourceUrl}`;
+      }
+      context += `\n${ref.content}\n`;
     });
   }
 

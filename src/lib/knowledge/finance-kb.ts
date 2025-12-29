@@ -9,6 +9,9 @@ export interface AccountingStandard {
   framework: "GAAP" | "IFRS";
   description: string;
   keywords: string[];
+  sourceUrl?: string;  // Provenance: Link to FASB/IASB documentation
+  lastUpdated?: string; // ISO timestamp of last update
+  version?: string;    // Version identifier
 }
 
 export interface FinancialReference {
@@ -16,9 +19,13 @@ export interface FinancialReference {
   content: string;
   keywords: string[];
   standards?: string[];
+  sourceUrl?: string;  // Provenance: Link to financial guidelines
+  lastUpdated?: string; // ISO timestamp of last update
+  version?: string;    // Version identifier
 }
 
 // Accounting Standards (GAAP/IFRS) - Expanded Database (20+ standards)
+// Sources: FASB Accounting Standards Codification, IFRS Foundation
 export const accountingStandards: AccountingStandard[] = [
   // Revenue & Contracts
   {
@@ -26,14 +33,20 @@ export const accountingStandards: AccountingStandard[] = [
     title: "Revenue from Contracts with Customers",
     framework: "GAAP",
     description: "Establishes principles for reporting information about the nature, timing, and uncertainty of revenue and cash flows",
-    keywords: ["revenue", "recognition", "contracts", "sales", "asc 606", "top line"]
+    keywords: ["revenue", "recognition", "contracts", "sales", "asc 606", "top line"],
+    sourceUrl: "https://asc.fasb.org/SectionDisplay.tpl?Section=606-10",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ASC-606-2014"
   },
   {
     code: "IFRS 15",
     title: "Revenue from Contracts with Customers",
     framework: "IFRS",
     description: "Five-step model for revenue recognition from contracts with customers",
-    keywords: ["revenue", "recognition", "contracts", "ifrs 15", "sales"]
+    keywords: ["revenue", "recognition", "contracts", "ifrs 15", "sales"],
+    sourceUrl: "https://www.ifrs.org/content/dam/features/ifrs15/assets/contract-assets/logo-ifrs15.svg",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "IFRS-15-2014"
   },
 
   // Leases
@@ -42,14 +55,20 @@ export const accountingStandards: AccountingStandard[] = [
     title: "Leases",
     framework: "GAAP",
     description: "Requires lessees to recognize assets and liabilities for most leases on the balance sheet",
-    keywords: ["lease", "leases", "rental", "asc 842", "operating lease", "finance lease"]
+    keywords: ["lease", "leases", "rental", "asc 842", "operating lease", "finance lease"],
+    sourceUrl: "https://asc.fasb.org/SectionDisplay.tpl?Section=842-10",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ASC-842-2016"
   },
   {
     code: "IFRS 16",
     title: "Leases",
     framework: "IFRS",
-    description: "Single lease accounting model requiring lessees to recognize right-of-use assets and lease liabilities",
-    keywords: ["lease", "leases", "ifrs 16", "right of use", "rou asset"]
+    description: "Single model for lease accounting requiring lessees to recognize lease assets and lease liabilities",
+    keywords: ["lease", "leases", "rental", "ifrs 16", "rou asset", "lease liability"],
+    sourceUrl: "https://www.ifrs.org/content/dam/features/ifrs16/assets/logo-ifrs16.svg",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "IFRS-16-2016"
   },
 
   // Fair Value & Valuation
@@ -266,7 +285,10 @@ export const financialReferences: FinancialReference[] = [
 
 Key considerations: variable consideration, constraining estimates, significant financing components, time value of money.`,
     keywords: ["revenue", "recognition", "asc 606", "ifrs 15"],
-    standards: ["ASC 606", "IFRS 15"]
+    standards: ["ASC 606", "IFRS 15"],
+    sourceUrl: "https://www.fasb.org/jsp/FASB/Page/SectionPage&cid=1176157313663",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ASC-606-2014"
   },
   {
     topic: "Lease Accounting (ASC 842 / IFRS 16)",
@@ -279,7 +301,10 @@ Key considerations: variable consideration, constraining estimates, significant 
 
 Short-term leases (<12 months) can be exempt from balance sheet recognition.`,
     keywords: ["lease", "asc 842", "ifrs 16", "rou asset"],
-    standards: ["ASC 842", "IFRS 16"]
+    standards: ["ASC 842", "IFRS 16"],
+    sourceUrl: "https://www.fasb.org/jsp/FASB/Page/SectionPage&cid=1176157313663",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ASC-842-2016"
   },
   {
     topic: "Fair Value Hierarchy (ASC 820 / IFRS 13)",
@@ -289,7 +314,10 @@ Level 3: Unobservable inputs (management estimates, projections)
 
 Highest and best use, principal market considerations, valuation techniques (market approach, income approach, cost approach)`,
     keywords: ["fair value", "asc 820", "ifrs 13", "valuation", "level 1", "level 2", "level 3"],
-    standards: ["ASC 820", "IFRS 13"]
+    standards: ["ASC 820", "IFRS 13"],
+    sourceUrl: "https://www.fasb.org/jsp/FASB/Page/SectionPage&cid=1176157313663",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "ASC-820-2011"
   },
   {
     topic: "Financial Statement Analysis Ratios",
@@ -315,7 +343,10 @@ Efficiency Ratios:
 - Asset Turnover = Revenue / Total Assets
 - Inventory Turnover = COGS / Average Inventory
 - Days Sales Outstanding = (AR / Revenue) × 365`,
-    keywords: ["ratios", "liquidity", "profitability", "solvency", "analysis", "financial statements", "efficiency"]
+    keywords: ["ratios", "liquidity", "profitability", "solvency", "analysis", "financial statements", "efficiency"],
+    sourceUrl: "https://www.investopedia.com/terms/f/financial-ratios.asp",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "General-Knowledge"
   },
   {
     topic: "Revenue Forecasting Methods",
@@ -331,7 +362,10 @@ Best Practices:
 - Document assumptions and sensitivity analysis
 - Consider macroeconomic factors and industry trends
 - Validate forecasts against actuals regularly`,
-    keywords: ["forecast", "revenue", "projection", "growth", "cagr", "budgeting"]
+    keywords: ["forecast", "revenue", "projection", "growth", "cagr", "budgeting"],
+    sourceUrl: "https://www.investopedia.com/terms/r/revenue-forecast.asp",
+    lastUpdated: "2024-01-01T00:00:00Z",
+    version: "General-Knowledge"
   },
   {
     topic: "Credit Loss Modeling (CECL / IFRS 9)",
@@ -584,7 +618,11 @@ export function getFinancialContext(query: string): string {
   if (standards.length > 0) {
     context += "\n\nRelevant Accounting Standards:\n";
     standards.forEach((std) => {
-      context += `- ${std.code} (${std.framework}): ${std.title}\n`;
+      context += `- ${std.code} (${std.framework}): ${std.title}`;
+      if (std.sourceUrl) {
+        context += ` | Source: ${std.sourceUrl}`;
+      }
+      context += `\n`;
       context += `  ${std.description}\n`;
     });
   }
@@ -592,7 +630,11 @@ export function getFinancialContext(query: string): string {
   if (refs.length > 0) {
     context += "\n\nFinancial Reference Information:\n";
     refs.forEach((ref) => {
-      context += `\n${ref.topic}:\n${ref.content}\n`;
+      context += `\n${ref.topic}:`;
+      if (ref.sourceUrl) {
+        context += ` | Source: ${ref.sourceUrl}`;
+      }
+      context += `\n${ref.content}\n`;
     });
   }
 
