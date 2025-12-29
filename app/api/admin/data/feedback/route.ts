@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdminAuth } from '@/lib/auth';
 import { getDb } from '@/lib/db';
-import { feedbackAnalytics } from '@/lib/db/schema';
+import { feedback } from '@/lib/db/schema';
 import { sql, desc, count, avg, eq } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
@@ -25,37 +25,37 @@ export async function GET(request: NextRequest) {
     // Get all feedback with pagination
     const feedbackResult = await db
       .select()
-      .from(feedbackAnalytics)
-      .orderBy(desc(feedbackAnalytics.timestamp))
+      .from(feedback)
+      .orderBy(desc(feedback.createdAt))
       .limit(limit);
 
     // Calculate summary stats
     const statsResult = await db
       .select({
         total: count(),
-        avgRating: avg(feedbackAnalytics.rating),
+        avgRating: avg(feedback.rating),
       })
-      .from(feedbackAnalytics);
+      .from(feedback);
 
     // Get rating distribution
     const ratingDistributionResult = await db
       .select({
-        rating: feedbackAnalytics.rating,
+        rating: feedback.rating,
         count: count(),
       })
-      .from(feedbackAnalytics)
-      .groupBy(feedbackAnalytics.rating)
-      .orderBy(feedbackAnalytics.rating);
+      .from(feedback)
+      .groupBy(feedback.rating)
+      .orderBy(feedback.rating);
 
     // Get category breakdown
     const categoryBreakdownResult = await db
       .select({
-        category: feedbackAnalytics.category,
+        category: feedback.category,
         count: count(),
       })
-      .from(feedbackAnalytics)
-      .where(sql`${feedbackAnalytics.category} IS NOT NULL`)
-      .groupBy(feedbackAnalytics.category);
+      .from(feedback)
+      .where(sql`${feedback.category} IS NOT NULL`)
+      .groupBy(feedback.category);
 
     const totalFeedback = statsResult[0]?.total || 0;
     const avgRating = statsResult[0]?.avgRating || 0;
