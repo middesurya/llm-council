@@ -3,13 +3,24 @@ import { requireAdminAuth } from '@/lib/auth';
 import { getDb } from '@/lib/db';
 import { queryAnalytics, expertPerformance } from '@/lib/db/schema';
 import { sql, desc, count, avg } from 'drizzle-orm';
+import { getCachedAdminData, setCachedAdminData } from '@/lib/cache';
 
 export async function GET(request: NextRequest) {
   try {
     // Require authentication
     await requireAdminAuth();
 
-    // Get database connection
+    // Get query parameters for filtering
+    const searchParams = request.nextUrl.searchParams;
+    const days = parseInt(searchParams.get('days') || '7');
+
+    // Try to get from cache first
+    const cached = await getCachedAdminData<any>('dashboard', { days });
+    if (cached) {
+      return NextResponse.json(cached);
+    }
+
+    // Cache miss - get database connection
     const db = await getDb();
     if (!db) {
       return NextResponse.json(
@@ -17,10 +28,6 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    // Get query parameters for filtering
-    const searchParams = request.nextUrl.searchParams;
-    const days = parseInt(searchParams.get('days') || '7');
 
     // Calculate date range
     const startDate = new Date();
@@ -83,7 +90,7 @@ export async function GET(request: NextRequest) {
     const avgProcessingTime = avgProcessingTimeResult[0]?.avg || 0;
     const avgResponseLength = avgResponseLengthResult[0]?.avg || 0;
 
-    return NextResponse.json({
+    const result = {
       totalQueries,
       avgProcessingTime: Math.round(avgProcessingTime / 1000 * 10) / 10, // Convert to seconds, 1 decimal
       avgResponseLength: Math.round(avgResponseLength),
@@ -100,7 +107,12 @@ export async function GET(request: NextRequest) {
         return acc;
       }, {}),
       dailyTrend: dailyTrendResult.map((item: any) => item.count),
-    });
+    };
+
+    // Cache the result
+    await setCachedAdminData('dashboard', result, { days });
+
+    return NextResponse.json(result);
   } catch (error: any) {
     console.error('[API] Dashboard error:', error);
 

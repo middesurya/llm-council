@@ -16,6 +16,7 @@ import {
   countSources,
   safeTrack,
 } from "@/lib/analytics/tracker";
+import { invalidateOnNewQuery } from "@/lib/cache";
 
 interface ExpertAnswer {
   provider: string;
@@ -339,6 +340,9 @@ Based on the expert answers and peer reviews, provide a comprehensive final answ
       citationCount: countCitations(finalSynthesis, domain),
       sourceCount: countSources(finalSynthesis) + countSources(enhancedQuery),
     }), 'Query analytics tracking (streaming)');
+
+    // Invalidate admin cache when new query is processed
+    safeTrack(() => invalidateOnNewQuery(), 'Admin cache invalidation');
 
   } catch (error) {
     logWithContext.error('Stage 3 streaming failed', error as Error, { queryId, domain });
