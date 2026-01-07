@@ -9,13 +9,21 @@
     "lint": "eslint",
     "db:migrate": "npx tsx scripts/migrate.ts",
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "db:start": "docker run -d --name llm-council-db -e POSTGRES_USER=llm_council_user -e POSTGRES_PASSWORD=llm_council_password -e POSTGRES_DB=llm_council -p 5432:5432 postgres:15",
+    "db:stop": "docker stop llm-council-db && docker rm llm-council-db",
+    "redis:start": "docker run -d --name llm-council-redis -p 6379:6379 redis:7-alpine",
+    "redis:stop": "docker stop llm-council-redis && docker rm llm-council-redis",
+    "services:start": "docker-compose up -d",
+    "services:stop": "docker-compose down",
+    "services:logs": "docker-compose logs -f"
   },
   "dependencies": {
     "@types/validator": "^13.15.10",
     "dotenv": "^17.2.3",
     "drizzle-orm": "^0.45.1",
     "express-rate-limit": "^8.2.1",
+    "ioredis": "^5.8.2",
     "joi": "^18.0.2",
     "next": "16.1.0",
     "openai": "^6.15.0",

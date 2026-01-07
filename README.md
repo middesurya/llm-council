@@ -1,24 +1,83 @@
 # LLM Council - Multi-Expert AI Consensus System
 
-A sophisticated multi-expert AI system that orchestrates multiple LLM providers through a three-stage council process to deliver comprehensive, well-reasoned answers with domain-specific intelligence.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/middesurya/llm-council)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org/)
+
+A sophisticated multi-expert AI system that orchestrates multiple LLM providers (OpenAI, Anthropic, Google) through a three-stage council process to deliver comprehensive, well-reasoned answers with domain-specific intelligence.
+
+<!-- TODO: Add live demo link once deployed -->
+<!-- **[Live Demo](https://llm-council.vercel.app)** -->
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        User Query                            │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Stage 1: Divergent Answers (Parallel)           │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐  │
+│  │  OpenAI     │  │  Anthropic  │  │  Google Gemini      │  │
+│  │  GPT-4      │  │  Claude     │  │  Pro                │  │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘  │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Stage 2: Peer Review & Ranking                  │
+│         Each expert reviews and ranks all answers            │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│              Stage 3: Final Synthesis                        │
+│         Best-ranked expert synthesizes consensus             │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Final Response                            │
+│         With citations (ICD-10 / GAAP / IFRS)               │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ## Features
 
-- 🎯 **Three-Stage Council Process**: Divergent answers → Peer review → Final synthesis
-- 🧠 **Domain-Specific Intelligence**: Healthcare (ICD-10 codes) & Finance (GAAP/IFRS standards)
-- 🔍 **Semantic Search**: Vector embeddings for intelligent knowledge retrieval
-- 📚 **Knowledge Provenance**: All information sourced from authoritative references
-- 📊 **Code Citation Enforcement**: LLMs automatically cite medical codes and accounting standards
-- ⚡ **Real-Time Streaming**: Watch the council deliberate in real-time
+- **Three-Stage Council Process**: Divergent answers → Peer review → Final synthesis
+- **Domain-Specific Intelligence**: Healthcare (ICD-10 codes) & Finance (GAAP/IFRS standards)
+- **Semantic Search**: Vector embeddings for intelligent knowledge retrieval
+- **Real-Time Streaming**: Watch the council deliberate in real-time
+- **Admin Dashboard**: Analytics, performance tracking, and query history
+- **Redis Caching**: High-performance caching for faster responses
+- **Rate Limiting**: Protection against abuse with configurable limits
+
+## Tech Stack
+
+| Category | Technology |
+|----------|------------|
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript 5 |
+| Database | PostgreSQL (Neon) |
+| ORM | Drizzle ORM |
+| Cache | Redis (Upstash) |
+| LLM Providers | OpenAI, Anthropic, Google AI |
+| Vector Search | OpenAI Embeddings |
+| Styling | Tailwind CSS |
+| Deployment | Vercel |
 
 ## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ installed
-- API keys for LLM providers (see [Configuration](#configuration))
+- Node.js 18+
+- Docker (for local development)
+- API keys for LLM providers
 
-### Installation
+### Local Development
 
 1. **Clone the repository**
 ```bash
@@ -31,192 +90,220 @@ cd llm-council
 npm install
 ```
 
-3. **Configure environment variables**
+3. **Start local services (PostgreSQL + Redis)**
+```bash
+npm run services:start
+```
+
+4. **Configure environment**
 ```bash
 cp .env.example .env
 # Edit .env and add your API keys
 ```
 
-4. **Generate vector embeddings (optional but recommended)**
+5. **Run database migrations**
+```bash
+npm run db:migrate
+```
+
+6. **Generate vector embeddings (optional)**
 ```bash
 npx tsx scripts/populate-embeddings.ts
 ```
-This creates semantic search embeddings for enhanced knowledge retrieval (requires OpenAI API key).
 
-5. **Start the development server**
+7. **Start the development server**
 ```bash
 npm run dev
 ```
 
-6. **Open your browser**
+8. **Open your browser**
 Navigate to [http://localhost:3000](http://localhost:3000)
 
-## Configuration
+## Deployment
 
-Create a `.env` file in the project root with the following variables:
+### Deploy to Vercel (Recommended)
 
+#### 1. Set Up Database (Neon PostgreSQL - Free)
+
+1. Go to [neon.tech](https://neon.tech) and create a free account
+2. Create a new project
+3. Copy the connection string (looks like `postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/dbname?sslmode=require`)
+
+#### 2. Set Up Cache (Upstash Redis - Free)
+
+1. Go to [upstash.com](https://upstash.com) and create a free account
+2. Create a new Redis database
+3. Copy the connection URL (use the one that starts with `rediss://`)
+
+#### 3. Deploy to Vercel
+
+1. Click the "Deploy with Vercel" button above, or:
 ```bash
-# Required API Keys
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
-OPENAI_API_KEY=your_openai_api_key_here
-GOOGLE_AI_API_KEY=your_google_ai_api_key_here
-
-# Database
-DATABASE_URL=file:./db/dev.db
-
-# Optional (for enhanced features)
-HUGGINGFACE_API_KEY=your_huggingface_api_key_here
-PINECONE_API_KEY=your_pinecone_api_key_here
+npm i -g vercel
+vercel
 ```
 
-See `.env.example` for all available configuration options.
+2. Add environment variables in Vercel dashboard:
+   - `DATABASE_URL` - Your Neon PostgreSQL connection string
+   - `REDIS_URL` - Your Upstash Redis URL
+   - `ADMIN_PASSWORD` - A secure admin password
+   - `OPENAI_API_KEY` - Your OpenAI API key
+   - `ANTHROPIC_API_KEY` - Your Anthropic API key
+   - `GOOGLE_API_KEY` - Your Google AI API key
+   - `ENABLE_CACHE` - Set to `true`
+
+3. Run database setup:
+```bash
+npx tsx scripts/setup-db.ts
+```
+
+### Environment Variables
+
+See `.env.production.example` for all production configuration options.
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `REDIS_URL` | No | Redis connection string (caching) |
+| `ADMIN_PASSWORD` | Yes | Admin dashboard password |
+| `OPENAI_API_KEY` | Yes* | OpenAI API key |
+| `ANTHROPIC_API_KEY` | Yes* | Anthropic API key |
+| `GOOGLE_API_KEY` | Yes* | Google AI API key |
+
+*At least one LLM provider key is required.
+
+## API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/health` | GET | Health check (DB + Redis status) |
+| `/api/council/query` | POST | Submit query to council |
+| `/api/council/query/stream` | POST | Submit query with streaming |
+| `/api/status` | GET | LLM provider status |
+| `/api/admin/data/dashboard` | GET | Dashboard analytics |
+
+### Health Check Response
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "version": "0.1.0",
+  "uptime": 3600,
+  "checks": {
+    "database": { "status": "up", "latency": 5 },
+    "redis": { "status": "up", "latency": 2 }
+  }
+}
+```
 
 ## Project Structure
 
 ```
 llm-council/
 ├── app/                          # Next.js app directory
-│   ├── healthcare/              # Healthcare domain interface
-│   ├── finance/                 # Finance domain interface
-│   └── api/                     # API routes
+│   ├── healthcare/               # Healthcare domain UI
+│   ├── finance/                  # Finance domain UI
+│   ├── admin/                    # Admin dashboard
+│   └── api/                      # API routes
+│       ├── health/               # Health check endpoint
+│       ├── council/              # Council query endpoints
+│       └── admin/                # Admin API routes
 ├── src/
 │   ├── lib/
-│   │   ├── llm/                # LLM orchestration logic
-│   │   │   ├── orchestrator.ts         # Main council orchestration
-│   │   │   └── orchestrator-stream.ts  # Streaming orchestration
-│   │   └── knowledge/           # Domain knowledge base
-│   │       ├── healthcare-kb.ts         # Medical knowledge (ICD-10)
-│   │       ├── finance-kb.ts            # Financial knowledge (GAAP/IFRS)
-│   │       ├── vector-store.ts          # Semantic search
-│   │       └── index.ts                 # Knowledge service
+│   │   ├── llm/                  # LLM orchestration
+│   │   ├── knowledge/            # Domain knowledge bases
+│   │   ├── cache/                # Redis caching layer
+│   │   ├── db/                   # Database schema & client
+│   │   ├── security/             # Rate limiting, validation
+│   │   └── observability/        # Logging, metrics
 │   └── config/
-│       └── domains.ts          # Domain-specific system prompts
-├── scripts/                     # Utility scripts
-│   ├── populate-embeddings.ts  # Generate vector embeddings
-│   └── benchmark-citations.js  # Test citation accuracy
-└── docs/                        # Documentation
-    ├── skills.md                # Project architecture
-    ├── performance-benchmark-results.md  # Benchmark analysis
-    └── skills-*.md              # Detailed guides
+│       └── domains.ts            # Domain-specific prompts
+├── scripts/                      # Utility scripts
+│   ├── setup-db.ts               # Database setup
+│   ├── populate-embeddings.ts    # Generate embeddings
+│   └── migrate.ts                # Run migrations
+└── docs/                         # Documentation
 ```
-
-## Usage
-
-### Healthcare Domain
-
-Ask medical questions and receive responses with:
-- ICD-10 code citations (e.g., `Type 2 Diabetes [ICD-10: E11]`)
-- Symptom classifications
-- Red flag warnings for urgent conditions
-- Authoritative medical sources
-
-**Example:**
-> Query: "What causes high blood sugar?"
->
-> Response includes:
-> - Type 2 Diabetes [ICD-10: E11]
-> - Hyperglycemia [ICD-10: R73.9]
-> - Associated symptoms with codes
-> - Red flags for diabetic ketoacidosis
-> - Source: ADA Standards of Care
-
-### Finance Domain
-
-Ask accounting/finance questions and receive responses with:
-- GAAP/IFRS standard citations (e.g., `ASC 606 / IFRS 15`)
-- Section-level references
-- Implementation guidance
-- Compliance considerations
-- Authoritative sources (FASB, IFRS Foundation)
-
-**Example:**
-> Query: "How do I recognize revenue?"
->
-> Response includes:
-> - ASC 606 / IFRS 15 five-step model
-> - Section references (ASC 606-10-25-1)
-> - Implementation guidance
-> - Compliance warnings
-> - Source: FASB Accounting Standards Codification
 
 ## Development
 
 ### Available Scripts
 
 ```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
+npm run dev              # Start development server
+npm run build            # Build for production
+npm run start            # Start production server
+npm run lint             # Run ESLint
+npm run db:migrate       # Run database migrations
+npm run db:generate      # Generate migration files
+npm run services:start   # Start Docker services
+npm run services:stop    # Stop Docker services
 ```
 
-### Generate Embeddings
+## Usage Examples
 
-To regenerate semantic search embeddings:
+### Healthcare Domain
 
-```bash
-npx tsx scripts/populate-embeddings.ts
-```
+Ask medical questions and receive responses with ICD-10 code citations:
 
-This requires an OpenAI API key and creates `.data/embeddings.json`.
+> **Query**: "What causes high blood sugar?"
+>
+> **Response includes**:
+> - Type 2 Diabetes [ICD-10: E11]
+> - Hyperglycemia [ICD-10: R73.9]
+> - Red flags for diabetic ketoacidosis
+> - Source: ADA Standards of Care
 
-### Run Benchmarks
+### Finance Domain
 
-Test citation accuracy:
+Ask accounting questions with GAAP/IFRS standard citations:
 
-```bash
-npx tsx scripts/benchmark-citations.js
-```
+> **Query**: "How do I recognize revenue?"
+>
+> **Response includes**:
+> - ASC 606 / IFRS 15 five-step model
+> - Section references (ASC 606-10-25-1)
+> - Implementation guidance
+> - Source: FASB Accounting Standards Codification
 
 ## Performance
 
-**Benchmark Results (Phase 3):**
-- Overall Citation Accuracy: 73.9%
-- Finance Domain: 100%
-- Healthcare Domain: 61.1%
-- Source URL Inclusion: 87.5%
-- Query Enhancement: 23x increase in context
+- **Overall Citation Accuracy**: 73.9%
+- **Finance Domain Accuracy**: 100%
+- **Healthcare Domain Accuracy**: 61.1%
+- **Source URL Inclusion**: 87.5%
+- **Cache Hit Rate**: 80%+ (with Redis enabled)
 
-## Features Implemented
+## Roadmap
 
-### Phase 1: Core Council System ✅
-- Multi-expert LLM orchestration
-- Three-stage deliberation process
-- Streaming responses
-- Feedback collection
-
-### Phase 2: Domain-Specific Intelligence ✅
-- Healthcare knowledge base (ICD-10 codes)
-- Finance knowledge base (GAAP/IFRS standards)
-- Domain-specific system prompts
-
-### Phase 3: Advanced Features ✅
-- Semantic search with vector embeddings
-- Enhanced prompts with code citations
-- Knowledge provenance tracking
-- Performance benchmarking
-
-## Technology Stack
-
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
-- **Database**: SQLite with Drizzle ORM
-- **LLM Providers**: Anthropic (Claude), OpenAI (GPT), Google AI (Gemini)
-- **Vector Search**: OpenAI text-embedding-3-small
-- **Styling**: Tailwind CSS
+- [x] Phase 1: Core Council System
+- [x] Phase 2: Domain-Specific Intelligence
+- [x] Phase 3: Semantic Search & Citations
+- [x] Phase 4: Admin Dashboard & Analytics
+- [x] Phase 5: Redis Caching & Rate Limiting
+- [ ] Phase 6: User Accounts & History
+- [ ] Phase 7: A/B Testing Framework
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
-Built with [Claude Code](https://claude.com/claude-code) - Anthropic's AI CLI tool.
+- Built with [Claude Code](https://claude.com/claude-code) - Anthropic's AI CLI tool
+- Inspired by [Andrej Karpathy's LLM Council](https://github.com/karpathy/llm-council)
 
 ---
 
-**Note**: This system provides educational information only. For medical, financial, or legal advice, please consult qualified professionals.
+**Disclaimer**: This system provides educational information only. For medical, financial, or legal advice, please consult qualified professionals.

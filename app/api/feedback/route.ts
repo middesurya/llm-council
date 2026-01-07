@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateFeedback } from "@/lib/security/validator";
 import { submitFeedback } from "@/lib/db/feedback";
 import { logWithContext } from "@/lib/observability";
+import { invalidateOnNewFeedback } from "@/lib/cache";
 
 export async function POST(request: NextRequest) {
   const requestId = `feedback_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -67,6 +68,9 @@ export async function POST(request: NextRequest) {
       requestId,
       feedbackId: result.feedbackId,
     });
+
+    // Invalidate admin cache when new feedback is submitted
+    await invalidateOnNewFeedback();
 
     return NextResponse.json(
       {
