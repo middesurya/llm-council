@@ -10,7 +10,7 @@ const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 
 // Singleton Redis client instance
 let _redis: Redis | null = null;
-let _connectPromise: Promise<Redis> | null = null;
+let _connectPromise: Promise<Redis | null> | null = null;
 
 /**
  * Get or create Redis client connection

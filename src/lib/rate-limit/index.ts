@@ -5,7 +5,7 @@
  * abuse and ensure fair resource allocation
  */
 
-import { incrementCounter, getCounter, resetCounter, CACHE_CONFIG } from '../lib/cache';
+import { incrementCounter, getCounter, resetCounter, CACHE_CONFIG } from '../cache';
 
 export interface RateLimitConfig {
   /** Maximum number of requests allowed */
