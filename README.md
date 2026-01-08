@@ -9,6 +9,8 @@ A sophisticated multi-expert AI system that orchestrates multiple LLM providers 
 
 **[Live Demo](https://llm-council-gules.vercel.app)** | **[Healthcare](https://llm-council-gules.vercel.app/healthcare)** | **[Finance](https://llm-council-gules.vercel.app/finance)**
 
+![LLM Council Screenshot](docs/images/screenshot.png)
+
 ## Architecture
 
 ```
