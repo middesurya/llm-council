@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { isRedisAvailable } from "@/lib/cache/client";
-import { db } from "@/lib/db";
+import { getDb } from "@/lib/db";
 import { sql } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +28,10 @@ export async function GET() {
   // Check Database
   const dbStart = Date.now();
   try {
+    const db = await getDb();
+    if (!db) {
+      throw new Error("Database not configured");
+    }
     await db.execute(sql`SELECT 1`);
     checks.database = {
       status: "up",
