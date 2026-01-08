@@ -16,7 +16,7 @@ export function getLLMConfig(provider: LLMConfig["provider"], model: string): LL
 
   const baseUrls: Partial<Record<LLMConfig["provider"], string>> = {
     openai: "https://api.openai.com/v1",
-    google: "https://generativelanguage.googleapis.com/v1",
+    google: "https://generativelanguage.googleapis.com/v1beta",
   };
 
   return {
