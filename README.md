@@ -7,8 +7,7 @@
 
 A sophisticated multi-expert AI system that orchestrates multiple LLM providers (OpenAI, Anthropic, Google) through a three-stage council process to deliver comprehensive, well-reasoned answers with domain-specific intelligence.
 
-<!-- TODO: Add live demo link once deployed -->
-<!-- **[Live Demo](https://llm-council.vercel.app)** -->
+**[Live Demo](https://llm-council-gules.vercel.app)** | **[Healthcare](https://llm-council-gules.vercel.app/healthcare)** | **[Finance](https://llm-council-gules.vercel.app/finance)**
 
 ## Architecture
 
