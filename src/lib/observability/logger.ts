@@ -1,8 +1,8 @@
 import winston from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
+const isVercel = !!process.env.VERCEL;
 
 // Custom log format
 const logFormat = winston.format.combine(
@@ -35,48 +35,62 @@ const consoleFormat = winston.format.combine(
   })
 );
 
-// Create logs directory
-const logDir = path.join(process.cwd(), 'logs');
+// Build transports array based on environment
+const transports: winston.transport[] = [];
 
-// File transport for all logs
-const fileTransport = new DailyRotateFile({
-  dirname: logDir,
-  filename: 'application-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
-  maxSize: '20m',
-  maxFiles: '14d',
-  format: logFormat,
-});
+// Always add console transport in production/Vercel (serverless has no filesystem)
+if (isVercel || !isDevelopment) {
+  transports.push(new winston.transports.Console({
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.json()
+    ),
+  }));
+} else {
+  // In development, use pretty console output
+  transports.push(new winston.transports.Console({
+    format: consoleFormat,
+  }));
 
-// File transport for errors only
-const errorFileTransport = new DailyRotateFile({
-  dirname: logDir,
-  filename: 'error-%DATE%.log',
-  datePattern: 'YYYY-MM-DD',
-  maxSize: '20m',
-  maxFiles: '30d',
-  level: 'error',
-  format: logFormat,
-});
+  // Only use file transports in local development (not Vercel)
+  try {
+    const DailyRotateFile = require('winston-daily-rotate-file');
+    const logDir = path.join(process.cwd(), 'logs');
+
+    // File transport for all logs
+    transports.push(new DailyRotateFile({
+      dirname: logDir,
+      filename: 'application-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '14d',
+      format: logFormat,
+    }));
+
+    // File transport for errors only
+    transports.push(new DailyRotateFile({
+      dirname: logDir,
+      filename: 'error-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxSize: '20m',
+      maxFiles: '30d',
+      level: 'error',
+      format: logFormat,
+    }));
+  } catch (e) {
+    // File transports not available, continue with console only
+    console.warn('File logging not available, using console only');
+  }
+}
 
 // Create logger instance
 export const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || (isDevelopment ? 'debug' : 'info'),
   format: logFormat,
-  transports: [
-    fileTransport,
-    errorFileTransport,
-  ],
+  transports,
   // Don't exit on error
   exitOnError: false,
 });
-
-// Add console transport in development
-if (isDevelopment) {
-  logger.add(new winston.transports.Console({
-    format: consoleFormat,
-  }));
-}
 
 // Enhanced logging methods with context
 export const logWithContext = {
