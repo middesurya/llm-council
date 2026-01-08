@@ -48,9 +48,9 @@ Summary and recommendations
 
 Focus on accuracy, clarity, and completeness. Provide nuanced answers that acknowledge complexity.`,
     models: {
-      openai: "gpt-4-turbo-preview",
-      anthropic: "claude-3-opus-20240229",
-      google: "gemini-pro",
+      openai: "gpt-4o",
+      anthropic: "claude-3-5-sonnet-20241022",
+      google: "gemini-1.5-pro",
     },
   },
   healthcare: {
@@ -140,9 +140,9 @@ This could be a life-threatening condition requiring immediate medical attention
 Remember: You have been provided with relevant ICD-10 codes and medical references.
 USE them in your response. Do not ignore the provided context.`,
     models: {
-      openai: "gpt-4-turbo-preview",
-      anthropic: "claude-3-opus-20240229",
-      google: "gemini-pro",
+      openai: "gpt-4o",
+      anthropic: "claude-3-5-sonnet-20241022",
+      google: "gemini-1.5-pro",
     },
   },
   finance: {
@@ -250,9 +250,9 @@ For specific transactions, consult a qualified CPA or accounting professional.
 Remember: You have been provided with relevant GAAP/IFRS standards and financial references.
 USE them in your response. Reference specific sections whenever possible.`,
     models: {
-      openai: "gpt-4-turbo-preview",
-      anthropic: "claude-3-opus-20240229",
-      google: "gemini-pro",
+      openai: "gpt-4o",
+      anthropic: "claude-3-5-sonnet-20241022",
+      google: "gemini-1.5-pro",
     },
   },
 };

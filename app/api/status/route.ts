@@ -12,9 +12,9 @@ export async function GET() {
   for (const provider of providers) {
     try {
       const models: Record<string, string> = {
-        openai: "gpt-4-turbo-preview",
-        anthropic: "claude-3-opus-20240229",
-        google: "gemini-pro",
+        openai: "gpt-4o",
+        anthropic: "claude-3-5-sonnet-20241022",
+        google: "gemini-1.5-pro",
       };
 
       const config = getLLMConfig(provider, models[provider]);
@@ -48,10 +48,10 @@ export async function GET() {
         status: "error",
         model:
           provider === "openai"
-            ? "gpt-4-turbo-preview"
+            ? "gpt-4o"
             : provider === "anthropic"
-            ? "claude-3-opus-20240229"
-            : "gemini-pro",
+            ? "claude-3-5-sonnet-20241022"
+            : "gemini-1.5-pro",
         error: error.message || "Unknown error",
       };
     }
