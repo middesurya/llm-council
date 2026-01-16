@@ -8,6 +8,7 @@ export interface PersonaConfig {
 
 /**
  * Get domain-specific persona for a model provider
+ * Updated to use new Violet/Cyan/Teal/Blue color palette
  */
 export function getModelPersona(
   provider: string,
@@ -22,8 +23,8 @@ export function getModelPersona(
           name: "Dr. GPT",
           title: "Medical Specialist",
           icon: "🩺",
-          color: "emerald",
-          gradient: "from-emerald-500 to-teal-600",
+          color: "teal",
+          gradient: "from-teal-500 to-cyan-500",
         };
       case "anthropic":
         return {
@@ -31,23 +32,23 @@ export function getModelPersona(
           title: "Clinical Consultant",
           icon: "🏥",
           color: "cyan",
-          gradient: "from-cyan-500 to-blue-600",
+          gradient: "from-cyan-500 to-teal-500",
         };
       case "google":
         return {
           name: "Dr. Gemini",
           title: "Healthcare Analyst",
           icon: "💊",
-          color: "teal",
-          gradient: "from-teal-500 to-emerald-600",
+          color: "emerald",
+          gradient: "from-emerald-500 to-teal-500",
         };
       default:
         return {
           name: `Dr. ${provider}`,
           title: "Medical Expert",
           icon: "👨‍⚕️",
-          color: "emerald",
-          gradient: "from-emerald-500 to-teal-600",
+          color: "teal",
+          gradient: "from-teal-500 to-cyan-500",
         };
     }
   }
@@ -59,45 +60,45 @@ export function getModelPersona(
           name: "Analyst GPT",
           title: "Financial Advisor",
           icon: "📊",
-          color: "amber",
-          gradient: "from-amber-500 to-orange-600",
+          color: "blue",
+          gradient: "from-blue-500 to-indigo-500",
         };
       case "anthropic":
         return {
           name: "Auditor Claude",
           title: "Risk Analyst",
           icon: "💰",
-          color: "yellow",
-          gradient: "from-yellow-500 to-amber-600",
+          color: "indigo",
+          gradient: "from-indigo-500 to-blue-500",
         };
       case "google":
         return {
           name: "Strategist Gemini",
           title: "Investment Analyst",
           icon: "📈",
-          color: "orange",
-          gradient: "from-orange-500 to-red-600",
+          color: "violet",
+          gradient: "from-violet-500 to-blue-500",
         };
       default:
         return {
           name: `Analyst ${provider}`,
           title: "Financial Expert",
           icon: "💼",
-          color: "amber",
-          gradient: "from-amber-500 to-orange-600",
+          color: "blue",
+          gradient: "from-blue-500 to-indigo-500",
         };
     }
   }
 
-  // General domain
+  // General domain - Cyan/Violet theme
   switch (providerLower) {
     case "openai":
       return {
         name: "Expert GPT",
         title: "Research Analyst",
         icon: "💡",
-        color: "indigo",
-        gradient: "from-indigo-500 to-purple-600",
+        color: "cyan",
+        gradient: "from-cyan-500 to-violet-500",
       };
     case "anthropic":
       return {
@@ -105,23 +106,23 @@ export function getModelPersona(
         title: "Knowledge Specialist",
         icon: "📚",
         color: "violet",
-        gradient: "from-violet-500 to-purple-600",
+        gradient: "from-violet-500 to-cyan-500",
       };
     case "google":
       return {
         name: "Thinker Gemini",
         title: "Information Analyst",
         icon: "🧠",
-        color: "cyan",
-        gradient: "from-cyan-500 to-blue-600",
+        color: "teal",
+        gradient: "from-teal-500 to-violet-500",
       };
     default:
       return {
         name: `Expert ${provider}`,
         title: "AI Specialist",
         icon: "🤖",
-        color: "indigo",
-        gradient: "from-indigo-500 to-purple-600",
+        color: "cyan",
+        gradient: "from-cyan-500 to-violet-500",
       };
   }
 }
