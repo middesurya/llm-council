@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import FeedbackForm from "./FeedbackForm";
 import DomainDisclaimer from "./DomainDisclaimer";
 import StructuredInput from "./StructuredInput";
@@ -10,7 +9,6 @@ import StreamingText from "./StreamingText";
 import StageProgress from "./StageProgress";
 import ExpertCard from "./ExpertCard";
 import { getModelPersona } from "@/lib/utils/personas";
-import { fadeInUp, staggerContainer, staggerItem } from "@/lib/utils/animations";
 
 interface ChatInterfaceProps {
   domain?: string;
@@ -144,16 +142,27 @@ export default function ChatInterface({
   const getDomainGradient = () => {
     switch (domain) {
       case "healthcare":
-        return "from-emerald-500 to-teal-600";
+        return "from-teal-500 to-cyan-500";
       case "finance":
-        return "from-amber-500 to-orange-600";
+        return "from-blue-500 to-indigo-500";
       default:
-        return "from-indigo-500 to-purple-600";
+        return "from-cyan-500 to-violet-500";
+    }
+  };
+
+  const getDomainAccent = () => {
+    switch (domain) {
+      case "healthcare":
+        return "teal";
+      case "finance":
+        return "blue";
+      default:
+        return "violet";
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
       {/* Hero Header */}
       <div className="text-center space-y-4 animate-fade-in-up">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
@@ -161,7 +170,7 @@ export default function ChatInterface({
             {title}
           </span>
         </h1>
-        <p className="text-neutral-600 dark:text-neutral-400 text-lg max-w-2xl mx-auto">
+        <p className="text-slate-600 dark:text-slate-400 text-lg max-w-2xl mx-auto">
           {description}
         </p>
       </div>
@@ -176,7 +185,7 @@ export default function ChatInterface({
       <DocumentUpload domain={domain} onAnalyze={handleDocumentAnalyze} />
 
       {/* Query Form */}
-      <div className="glass-card p-6 sm:p-8 animate-fade-in-up stagger-1">
+      <div className="card card-elevated p-6 sm:p-8 animate-fade-in-up">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
@@ -186,23 +195,17 @@ export default function ChatInterface({
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Ask your question..."
                 disabled={loading}
-                className="w-full px-5 py-4 rounded-xl border border-neutral-200 dark:border-neutral-700
-                  bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white
-                  placeholder-neutral-400 dark:placeholder-neutral-500
-                  focus:border-indigo-500 dark:focus:border-indigo-500
-                  focus:ring-4 focus:ring-indigo-500/10
-                  outline-none transition-all text-base
-                  disabled:opacity-50 disabled:cursor-not-allowed"
+                className="input input-lg"
               />
             </div>
             <button
               type="submit"
               disabled={loading || !query.trim()}
               className={`
-                px-8 py-4 rounded-xl font-semibold text-white
+                btn px-8 py-4 rounded-xl font-semibold text-white
                 bg-gradient-to-r ${getDomainGradient()}
                 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]
-                disabled:opacity-50 disabled:cursor-not-allowed
+                disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
                 transition-all duration-200 flex items-center justify-center gap-2
               `}
             >
@@ -231,10 +234,10 @@ export default function ChatInterface({
                 onChange={(e) => setUseStreaming(e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-neutral-200 dark:bg-neutral-700 rounded-full peer peer-checked:bg-indigo-500 transition-colors" />
+              <div className="w-11 h-6 bg-slate-200 dark:bg-slate-700 rounded-full peer peer-checked:bg-violet-500 transition-colors" />
               <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5" />
             </div>
-            <span className="text-sm text-neutral-600 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-neutral-200 transition-colors">
+            <span className="text-sm text-slate-600 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">
               <span className="mr-1.5">⚡</span>
               Real-time streaming responses
             </span>
@@ -243,117 +246,87 @@ export default function ChatInterface({
       </div>
 
       {/* Error Display */}
-      <AnimatePresence>
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="glass-card p-5 border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20"
-          >
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">⚠️</span>
-              <div>
-                <h3 className="font-semibold text-red-800 dark:text-red-200">
-                  Error
-                </h3>
-                <p className="text-red-600 dark:text-red-300 text-sm mt-1">
-                  {error}
-                </p>
-              </div>
+      {error && (
+        <div className="card p-5 border-l-4 border-red-500 bg-red-50 dark:bg-red-900/20 animate-fade-in-up">
+          <div className="flex items-start gap-3">
+            <span className="text-2xl">⚠️</span>
+            <div>
+              <h3 className="font-semibold text-red-800 dark:text-red-200">
+                Error
+              </h3>
+              <p className="text-red-600 dark:text-red-300 text-sm mt-1">
+                {error}
+              </p>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      )}
 
       {/* Stage Progress */}
-      <AnimatePresence>
-        {loading && currentStage && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="glass-card p-6"
-          >
-            <StageProgress
-              currentStage={currentStage}
-              expertCount={3}
-              completedExperts={completedExperts}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {loading && currentStage && (
+        <div className="card p-6 animate-fade-in-up">
+          <StageProgress
+            currentStage={currentStage}
+            expertCount={3}
+            completedExperts={completedExperts}
+          />
+        </div>
+      )}
 
       {/* Results Section */}
-      <AnimatePresence>
-        {(response || streamingContent) && (
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            animate="visible"
-            className="space-y-6"
-          >
-            {/* Final Answer Card */}
-            <motion.div
-              variants={fadeInUp}
-              className="premium-card overflow-hidden"
-            >
-              {/* Header with gradient */}
-              <div className={`bg-gradient-to-r ${getDomainGradient()} p-5 sm:p-6`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">✨</span>
-                    <div>
-                      <h2 className="text-xl font-bold text-white">
-                        Council Consensus
-                      </h2>
-                      <p className="text-white/80 text-sm">
-                        Synthesized from multiple AI experts
-                      </p>
-                    </div>
+      {(response || streamingContent) && (
+        <div className="space-y-6 stagger">
+          {/* Final Answer Card */}
+          <div className="card card-elevated overflow-hidden animate-fade-in-up">
+            {/* Header with gradient */}
+            <div className={`bg-gradient-to-r ${getDomainGradient()} p-5 sm:p-6`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">✨</span>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">
+                      Council Consensus
+                    </h2>
+                    <p className="text-white/80 text-sm">
+                      Synthesized from multiple AI experts
+                    </p>
                   </div>
-                  {loading && streamingContent && (
-                    <span className="px-3 py-1.5 bg-white/20 backdrop-blur-sm text-white text-xs font-medium rounded-full flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                      LIVE
-                    </span>
-                  )}
                 </div>
+                {loading && streamingContent && (
+                  <span className="px-3 py-1.5 bg-white/20 backdrop-blur-sm text-white text-xs font-medium rounded-full flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                    LIVE
+                  </span>
+                )}
               </div>
+            </div>
 
-              {/* Content */}
-              <div className="p-5 sm:p-6">
-                <StreamingText
-                  content={streamingContent || response?.stage3?.synthesis || ""}
-                  isStreaming={loading && !!streamingContent}
-                />
-              </div>
-            </motion.div>
+            {/* Content */}
+            <div className="p-5 sm:p-6">
+              <StreamingText
+                content={streamingContent || response?.stage3?.synthesis || ""}
+                isStreaming={loading && !!streamingContent}
+              />
+            </div>
+          </div>
 
-            {/* Expert Answers (Stage 1) */}
-            {(stage1Data.length > 0 ||
-              (!useStreaming && response?.stage1)) && (
-              <motion.details
-                variants={fadeInUp}
-                className="glass-card overflow-hidden group"
-                open
-              >
-                <summary className="px-5 sm:px-6 py-4 cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">🧠</span>
-                    <span className="font-semibold text-neutral-900 dark:text-white">
-                      Expert Analysis
-                    </span>
-                    <span className="ml-auto px-2.5 py-1 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 text-xs font-medium rounded-lg">
-                      Stage 1
-                    </span>
-                  </div>
-                </summary>
-                <div className="px-5 sm:px-6 pb-5 space-y-4 border-t border-neutral-200 dark:border-neutral-700 pt-5">
-                  {(stage1Data.length > 0
-                    ? stage1Data
-                    : response?.stage1 || []
-                  ).map((answer: any, idx: number) => {
+          {/* Expert Answers (Stage 1) */}
+          {(stage1Data.length > 0 || (!useStreaming && response?.stage1)) && (
+            <details className="card overflow-hidden group animate-fade-in-up" open>
+              <summary className="px-5 sm:px-6 py-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">🧠</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    Expert Analysis
+                  </span>
+                  <span className="ml-auto badge badge-violet">
+                    Stage 1
+                  </span>
+                </div>
+              </summary>
+              <div className="px-5 sm:px-6 pb-5 space-y-4 border-t border-slate-200 dark:border-slate-700 pt-5">
+                {(stage1Data.length > 0 ? stage1Data : response?.stage1 || []).map(
+                  (answer: any, idx: number) => {
                     const persona = getModelPersona(answer.provider, domain);
                     return (
                       <ExpertCard
@@ -365,93 +338,79 @@ export default function ChatInterface({
                         isStreaming={loading && idx === stage1Data.length - 1}
                       />
                     );
-                  })}
-                </div>
-              </motion.details>
-            )}
+                  }
+                )}
+              </div>
+            </details>
+          )}
 
-            {/* Peer Reviews (Stage 2) */}
-            {(stage2Data.length > 0 ||
-              (!useStreaming && response?.stage2)) && (
-              <motion.details
-                variants={fadeInUp}
-                className="glass-card overflow-hidden"
-              >
-                <summary className="px-5 sm:px-6 py-4 cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">⚖️</span>
-                    <span className="font-semibold text-neutral-900 dark:text-white">
-                      Peer Review
-                    </span>
-                    <span className="ml-auto px-2.5 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-xs font-medium rounded-lg">
-                      Stage 2
-                    </span>
-                  </div>
-                </summary>
-                <div className="px-5 sm:px-6 pb-5 space-y-3 border-t border-neutral-200 dark:border-neutral-700 pt-5">
-                  {(stage2Data.length > 0
-                    ? stage2Data
-                    : response?.stage2 || []
-                  ).map((review: any, idx: number) => {
-                    const reviewerPersona = getModelPersona(
-                      review.reviewerProvider,
-                      domain
-                    );
-                    const targetPersona = getModelPersona(
-                      review.targetProvider,
-                      domain
-                    );
+          {/* Peer Reviews (Stage 2) */}
+          {(stage2Data.length > 0 || (!useStreaming && response?.stage2)) && (
+            <details className="card overflow-hidden animate-fade-in-up">
+              <summary className="px-5 sm:px-6 py-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">⚖️</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    Peer Review
+                  </span>
+                  <span className="ml-auto badge badge-cyan">
+                    Stage 2
+                  </span>
+                </div>
+              </summary>
+              <div className="px-5 sm:px-6 pb-5 space-y-3 border-t border-slate-200 dark:border-slate-700 pt-5">
+                {(stage2Data.length > 0 ? stage2Data : response?.stage2 || []).map(
+                  (review: any, idx: number) => {
+                    const reviewerPersona = getModelPersona(review.reviewerProvider, domain);
+                    const targetPersona = getModelPersona(review.targetProvider, domain);
                     return (
-                      <motion.div
+                      <div
                         key={idx}
-                        variants={staggerItem}
-                        className="p-4 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border-l-2 border-cyan-500"
+                        className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border-l-2 border-cyan-500 animate-fade-in-up"
+                        style={{ animationDelay: `${idx * 50}ms` }}
                       >
                         <p className="text-sm">
                           <span className="mr-1">{reviewerPersona.icon}</span>
-                          <span className="font-medium text-neutral-700 dark:text-neutral-300">
+                          <span className="font-medium text-slate-700 dark:text-slate-300">
                             {reviewerPersona.name}
                           </span>
                           {" ranked "}
                           <span className="mr-1">{targetPersona.icon}</span>
-                          <span className="font-medium text-neutral-700 dark:text-neutral-300">
+                          <span className="font-medium text-slate-700 dark:text-slate-300">
                             {targetPersona.name}
                           </span>
                           {" as "}
-                          <span className="px-2 py-0.5 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-xs font-semibold rounded-md">
+                          <span className="badge badge-cyan">
                             #{review.ranking}
                           </span>
                         </p>
-                        <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
+                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
                           {review.reasoning}
                         </p>
-                      </motion.div>
+                      </div>
                     );
-                  })}
-                </div>
-              </motion.details>
-            )}
+                  }
+                )}
+              </div>
+            </details>
+          )}
 
-            {/* Feedback Form */}
-            {response?.queryId && !loading && (
-              <motion.div variants={fadeInUp}>
-                <FeedbackForm queryId={response.queryId} />
-              </motion.div>
-            )}
+          {/* Feedback Form */}
+          {response?.queryId && !loading && (
+            <div className="animate-fade-in-up">
+              <FeedbackForm queryId={response.queryId} />
+            </div>
+          )}
 
-            {/* Query Metadata */}
-            <motion.div
-              variants={fadeInUp}
-              className="text-center py-3"
-            >
-              <span className="text-xs text-neutral-400 dark:text-neutral-500 font-mono">
-                Query: {response?.queryId?.slice(0, 8)}... • Domain:{" "}
-                {response?.domain || domain}
-              </span>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          {/* Query Metadata */}
+          <div className="text-center py-3 animate-fade-in">
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
+              Query: {response?.queryId?.slice(0, 8)}... • Domain:{" "}
+              {response?.domain || domain}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
