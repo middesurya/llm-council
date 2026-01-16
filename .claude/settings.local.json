@@ -37,7 +37,8 @@
       "Bash(where:*)",
       "Bash(docker:*)",
       "Bash(ping:*)",
-      "Bash(del \"C:\\\\Users\\\\surya\\\\OneDrive\\\\Desktop\\\\work\\\\projects\\\\personal_proj\\\\llm_council\\\\test_login.ps1\")"
+      "Bash(del \"C:\\\\Users\\\\surya\\\\OneDrive\\\\Desktop\\\\work\\\\projects\\\\personal_proj\\\\llm_council\\\\test_login.ps1\")",
+      "Bash(gh pr create:*)"
     ]
   }
 }
