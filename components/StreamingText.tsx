@@ -31,7 +31,9 @@ export default function StreamingText({
             initial="hidden"
             animate="visible"
             transition={{
-              delay: isStreaming ? index * 0.01 : 0,
+              delay: isStreaming ? index * 0.008 : 0,
+              duration: 0.15,
+              ease: [0.2, 0, 0, 1],
             }}
             className="inline"
           >
@@ -40,15 +42,7 @@ export default function StreamingText({
         ))}
       </AnimatePresence>
       {isStreaming && (
-        <motion.span
-          className="inline-block w-1 h-5 ml-1 bg-indigo-500"
-          animate={{ opacity: [1, 0, 1] }}
-          transition={{
-            duration: 0.8,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
+        <span className="streaming-cursor" />
       )}
     </div>
   );

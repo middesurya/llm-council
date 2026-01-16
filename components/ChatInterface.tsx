@@ -154,20 +154,30 @@ export default function ChatInterface({
 
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-8">
-      {/* Hero Section */}
+      {/* Hero Section with Premium Typography */}
       <motion.div
         initial="hidden"
         animate="visible"
         variants={fadeInUp}
-        className="text-center space-y-3"
+        className="text-center space-y-4"
       >
-        <h1
-          className="text-5xl font-bold gradient-text-animated"
+        <motion.h1
+          className="text-5xl md:text-6xl font-bold gradient-text-animated leading-tight"
           style={{ fontFamily: "var(--font-space-grotesk)" }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.2, 0, 0, 1] }}
         >
           {title}
-        </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">{description}</p>
+        </motion.h1>
+        <motion.p
+          className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1, ease: [0.2, 0, 0, 1] }}
+        >
+          {description}
+        </motion.p>
       </motion.div>
 
       {/* Domain-Specific Disclaimer */}
@@ -179,7 +189,7 @@ export default function ChatInterface({
       {/* Document Upload */}
       <DocumentUpload domain={domain} onAnalyze={handleDocumentAnalyze} />
 
-      {/* Main Query Form */}
+      {/* Premium Query Form with Liquid Glass */}
       <motion.form
         onSubmit={handleSubmit}
         initial="hidden"
@@ -187,77 +197,137 @@ export default function ChatInterface({
         variants={fadeInUp}
         className="space-y-4"
       >
-        <div className="flex flex-col sm:flex-row gap-3">
-          <motion.input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Ask your question..."
-            disabled={loading}
-            className={`
-              flex-1 px-6 py-4 rounded-xl border-2 transition-all duration-200
-              focus:outline-none focus:ring-4
-              ${loading
-                ? "bg-gray-100 cursor-not-allowed"
-                : "bg-white hover:border-indigo-300"
-              }
-            `}
-            style={{
-              fontFamily: "var(--font-body)",
-              borderColor: "var(--color-neutral-300)",
-              color: "var(--foreground)",
-            }}
-            whileFocus={{
-              scale: 1.01,
-              boxShadow: "0 0 0 4px rgba(99, 102, 241, 0.1)",
-              borderColor: "var(--color-primary-500)",
-            }}
-          />
-          <motion.button
-            type="submit"
-            disabled={loading || !query.trim()}
-            className={`
-              px-8 py-4 rounded-xl font-semibold text-white
-              bg-gradient-to-r ${getDomainColor()}
-              shadow-lg hover:shadow-xl
-              disabled:opacity-50 disabled:cursor-not-allowed
-              transition-all duration-200
-            `}
-            style={{ fontFamily: "var(--font-space-grotesk)" }}
-            whileHover={!loading && query.trim() ? { scale: 1.05 } : {}}
-            whileTap={!loading && query.trim() ? { scale: 0.95 } : {}}
-          >
-            {loading ? (
-              <div className="flex items-center gap-2">
-                <motion.div
-                  className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                />
-                <span>Processing...</span>
-              </div>
-            ) : (
-              "Ask Council"
-            )}
-          </motion.button>
-        </div>
-
-        {/* Streaming Toggle */}
-        <motion.label
-          className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer glass"
-          whileHover={{ scale: 1.01 }}
+        <motion.div
+          className="liquid-glass p-2 rounded-2xl"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <input
-            type="checkbox"
-            checked={useStreaming}
-            onChange={(e) => setUseStreaming(e.target.checked)}
-            className="w-4 h-4 rounded accent-indigo-600"
-          />
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="flex-1 relative">
+              <motion.input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Ask your question..."
+                disabled={loading}
+                className={`
+                  w-full px-6 py-4 rounded-xl border-0 transition-all duration-300
+                  focus:outline-none bg-transparent
+                  ${loading ? "cursor-not-allowed opacity-60" : ""}
+                `}
+                style={{
+                  fontFamily: "var(--font-body)",
+                  color: "var(--foreground)",
+                  fontSize: "1.1rem",
+                }}
+              />
+              {/* Animated focus ring */}
+              <motion.div
+                className="absolute inset-0 rounded-xl pointer-events-none"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: query.length > 0 ? 1 : 0 }}
+                style={{
+                  background: "linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.1))",
+                }}
+              />
+            </div>
+            <motion.button
+              type="submit"
+              disabled={loading || !query.trim()}
+              className={`
+                relative overflow-hidden px-8 py-4 rounded-xl font-semibold text-white
+                bg-gradient-to-r ${getDomainColor()}
+                disabled:opacity-50 disabled:cursor-not-allowed
+                transition-all duration-300
+              `}
+              style={{ fontFamily: "var(--font-space-grotesk)" }}
+              whileHover={!loading && query.trim() ? {
+                scale: 1.02,
+                boxShadow: "0 10px 40px -10px rgba(99, 102, 241, 0.5)"
+              } : {}}
+              whileTap={!loading && query.trim() ? { scale: 0.98 } : {}}
+            >
+              {loading ? (
+                <div className="flex items-center gap-3">
+                  {/* Premium loading spinner */}
+                  <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <motion.circle
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      fill="none"
+                      strokeLinecap="round"
+                      initial={{ pathLength: 0, rotate: 0 }}
+                      animate={{ pathLength: 0.75, rotate: 360 }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                      style={{ transformOrigin: "center" }}
+                    />
+                  </svg>
+                  <span>Consulting...</span>
+                </div>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <span>Ask Council</span>
+                  <motion.span
+                    initial={{ x: 0 }}
+                    whileHover={{ x: 4 }}
+                    transition={{ type: "spring", stiffness: 400 }}
+                  >
+                    →
+                  </motion.span>
+                </span>
+              )}
+              {/* Shine effect on button */}
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                initial={{ x: "-100%" }}
+                animate={{ x: "200%" }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 4 }}
+              />
+            </motion.button>
+          </div>
+        </motion.div>
+
+        {/* Premium Streaming Toggle */}
+        <motion.label
+          className="flex items-center gap-3 px-5 py-3.5 rounded-xl cursor-pointer liquid-glass-interactive"
+          whileHover={{ scale: 1.005 }}
+          whileTap={{ scale: 0.995 }}
+        >
+          <div className="relative">
+            <input
+              type="checkbox"
+              checked={useStreaming}
+              onChange={(e) => setUseStreaming(e.target.checked)}
+              className="sr-only"
+            />
+            <motion.div
+              className={`w-11 h-6 rounded-full transition-colors duration-300 ${
+                useStreaming ? "bg-gradient-to-r from-indigo-500 to-cyan-500" : "bg-gray-300"
+              }`}
+            >
+              <motion.div
+                className="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow-md"
+                animate={{ x: useStreaming ? 22 : 2 }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              />
+            </motion.div>
+          </div>
           <span className="text-sm flex items-center gap-2">
-            <span className="text-lg">⚡</span>
-            <span style={{ color: "var(--foreground)" }}>
-              Enable real-time streaming (see answers appear live)
+            <motion.span
+              className="text-lg"
+              animate={useStreaming ? { scale: [1, 1.2, 1] } : {}}
+              transition={{ duration: 0.3 }}
+            >
+              ⚡
+            </motion.span>
+            <span style={{ color: "var(--foreground)", fontWeight: 500 }}>
+              Real-time streaming
             </span>
+            <span className="text-gray-500 text-xs">(see answers appear live)</span>
           </span>
         </motion.label>
       </motion.form>
@@ -309,30 +379,73 @@ export default function ChatInterface({
             animate="visible"
             className="space-y-6"
           >
-            {/* Final Answer */}
+            {/* Final Answer - Premium Liquid Glass Card */}
             <motion.div
               variants={fadeInUp}
-              className="premium-card gradient-border-animated p-8"
+              className="liquid-glass-elevated p-8 relative overflow-hidden"
             >
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-3xl">✨</span>
-                <h2
-                  className="text-3xl font-bold gradient-text"
-                  style={{ fontFamily: "var(--font-space-grotesk)" }}
-                >
-                  Council Consensus
-                </h2>
-                {loading && streamingContent && (
-                  <span className="px-3 py-1 rounded-full bg-cyan-100 text-cyan-700 text-sm font-medium animate-pulse">
-                    Streaming...
-                  </span>
-                )}
-              </div>
-              <StreamingText
-                content={streamingContent || response?.stage3?.synthesis || ""}
-                isStreaming={loading && !!streamingContent}
-                className="prose prose-lg max-w-none"
+              {/* Animated gradient border */}
+              <motion.div
+                className="absolute inset-0 rounded-2xl pointer-events-none"
+                style={{
+                  background: "linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(34, 211, 238, 0.1), rgba(99, 102, 241, 0.1))",
+                  backgroundSize: "200% 200%",
+                }}
+                animate={{
+                  backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                }}
+                transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
               />
+
+              <div className="relative z-10">
+                <div className="flex items-center gap-4 mb-6">
+                  <motion.div
+                    className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center"
+                    animate={loading && streamingContent ? {
+                      boxShadow: [
+                        "0 0 0 0 rgba(99, 102, 241, 0.4)",
+                        "0 0 0 10px rgba(99, 102, 241, 0)",
+                      ],
+                    } : {}}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  >
+                    <span className="text-2xl">✨</span>
+                  </motion.div>
+                  <div className="flex-1">
+                    <h2
+                      className="text-2xl md:text-3xl font-bold gradient-text"
+                      style={{ fontFamily: "var(--font-space-grotesk)" }}
+                    >
+                      Council Consensus
+                    </h2>
+                    <p className="text-sm text-gray-500">Synthesized from multiple AI experts</p>
+                  </div>
+                  {loading && streamingContent && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="liquid-glass-pill"
+                    >
+                      <div className="thinking-dots">
+                        <span />
+                        <span />
+                        <span />
+                      </div>
+                      <span className="text-xs font-medium text-cyan-700">Live</span>
+                    </motion.div>
+                  )}
+                </div>
+
+                <div className="gradient-divider mb-6" />
+
+                <div className="relative">
+                  <StreamingText
+                    content={streamingContent || response?.stage3?.synthesis || ""}
+                    isStreaming={loading && !!streamingContent}
+                    className="prose prose-lg max-w-none text-gray-800 leading-relaxed"
+                  />
+                </div>
+              </div>
             </motion.div>
 
             {/* Expert Answers (Stage 1) */}
