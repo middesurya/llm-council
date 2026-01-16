@@ -9,7 +9,7 @@ import DocumentUpload from "./DocumentUpload";
 import StreamingText from "./StreamingText";
 import StageProgress from "./StageProgress";
 import ExpertCard from "./ExpertCard";
-import { getModelPersona } from "@/lib/utils/personas";
+import { getModelPersona, type PersonaConfig } from "@/lib/utils/personas";
 import { fadeInUp, staggerContainer } from "@/lib/utils/animations";
 
 interface ChatInterfaceProps {

@@ -480,21 +480,34 @@ export function createFadeIn(
   direction: "up" | "down" | "left" | "right" = "up",
   distance = 20
 ): Variants {
-  const axis = direction === "up" || direction === "down" ? "y" : "x";
   const value =
     direction === "up" || direction === "left" ? distance : -distance;
 
-  return {
-    hidden: {
-      opacity: 0,
-      [axis]: value,
-    },
-    visible: {
-      opacity: 1,
-      [axis]: 0,
-      transition: transitions.base,
-    },
-  };
+  if (direction === "up" || direction === "down") {
+    return {
+      hidden: {
+        opacity: 0,
+        y: value,
+      },
+      visible: {
+        opacity: 1,
+        y: 0,
+        transition: transitions.base,
+      },
+    };
+  } else {
+    return {
+      hidden: {
+        opacity: 0,
+        x: value,
+      },
+      visible: {
+        opacity: 1,
+        x: 0,
+        transition: transitions.base,
+      },
+    };
+  }
 }
 
 /**
