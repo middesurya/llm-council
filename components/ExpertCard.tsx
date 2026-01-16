@@ -1,8 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useState } from "react";
-import { expertCard } from "@/lib/utils/animations";
 import type { PersonaConfig } from "@/lib/utils/personas";
 
 interface ExpertCardProps {
@@ -27,12 +25,6 @@ export default function ExpertCard({
       string,
       { bg: string; bgLight: string; border: string; text: string }
     > = {
-      indigo: {
-        bg: "bg-indigo-500",
-        bgLight: "bg-indigo-50 dark:bg-indigo-950/30",
-        border: "border-indigo-200 dark:border-indigo-800",
-        text: "text-indigo-700 dark:text-indigo-300",
-      },
       violet: {
         bg: "bg-violet-500",
         bgLight: "bg-violet-50 dark:bg-violet-950/30",
@@ -45,17 +37,29 @@ export default function ExpertCard({
         border: "border-cyan-200 dark:border-cyan-800",
         text: "text-cyan-700 dark:text-cyan-300",
       },
-      emerald: {
-        bg: "bg-emerald-500",
-        bgLight: "bg-emerald-50 dark:bg-emerald-950/30",
-        border: "border-emerald-200 dark:border-emerald-800",
-        text: "text-emerald-700 dark:text-emerald-300",
-      },
       teal: {
         bg: "bg-teal-500",
         bgLight: "bg-teal-50 dark:bg-teal-950/30",
         border: "border-teal-200 dark:border-teal-800",
         text: "text-teal-700 dark:text-teal-300",
+      },
+      blue: {
+        bg: "bg-blue-500",
+        bgLight: "bg-blue-50 dark:bg-blue-950/30",
+        border: "border-blue-200 dark:border-blue-800",
+        text: "text-blue-700 dark:text-blue-300",
+      },
+      indigo: {
+        bg: "bg-indigo-500",
+        bgLight: "bg-indigo-50 dark:bg-indigo-950/30",
+        border: "border-indigo-200 dark:border-indigo-800",
+        text: "text-indigo-700 dark:text-indigo-300",
+      },
+      emerald: {
+        bg: "bg-emerald-500",
+        bgLight: "bg-emerald-50 dark:bg-emerald-950/30",
+        border: "border-emerald-200 dark:border-emerald-800",
+        text: "text-emerald-700 dark:text-emerald-300",
       },
       amber: {
         bg: "bg-amber-500",
@@ -76,7 +80,7 @@ export default function ExpertCard({
         text: "text-orange-700 dark:text-orange-300",
       },
     };
-    return colors[color] || colors.indigo;
+    return colors[color] || colors.violet;
   };
 
   const colorClasses = getColorClasses(persona.color);
@@ -86,17 +90,13 @@ export default function ExpertCard({
     isExpanded || !isLong ? answer : answer.substring(0, previewLength) + "...";
 
   return (
-    <motion.div
-      custom={index}
-      variants={expertCard}
-      initial="hidden"
-      animate="visible"
-      whileHover="hover"
+    <div
       className={`
-        relative overflow-hidden rounded-xl border
+        relative overflow-hidden rounded-xl border animate-fade-in-up
         ${colorClasses.bgLight} ${colorClasses.border}
-        transition-all duration-300
+        transition-all duration-300 hover:shadow-md
       `}
+      style={{ animationDelay: `${index * 100}ms` }}
     >
       {/* Gradient accent line */}
       <div
@@ -104,50 +104,34 @@ export default function ExpertCard({
       />
 
       {/* Header */}
-      <div className="p-4 sm:p-5 border-b border-neutral-200/50 dark:border-neutral-700/50">
+      <div className="p-4 sm:p-5 border-b border-slate-200/50 dark:border-slate-700/50">
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
-            <motion.div
+            <div
               className={`
                 w-12 h-12 rounded-xl flex items-center justify-center text-2xl
                 bg-gradient-to-br ${persona.gradient} shadow-lg
+                ${isStreaming ? "animate-pulse" : ""}
               `}
-              animate={
-                isStreaming
-                  ? {
-                      scale: [1, 1.05, 1],
-                      boxShadow: [
-                        "0 10px 15px -3px rgba(0,0,0,0.1)",
-                        "0 10px 25px -3px rgba(0,0,0,0.2)",
-                        "0 10px 15px -3px rgba(0,0,0,0.1)",
-                      ],
-                    }
-                  : {}
-              }
-              transition={{
-                duration: 1.5,
-                repeat: isStreaming ? Infinity : 0,
-                ease: "easeInOut",
-              }}
             >
               {persona.icon}
-            </motion.div>
+            </div>
             <div>
               <h3 className={`text-lg font-bold ${colorClasses.text}`}>
                 {persona.name}
               </h3>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 {persona.title}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs px-2 py-1 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 font-mono">
+            <span className="text-xs px-2 py-1 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-mono">
               {model}
             </span>
             {isStreaming && (
-              <span className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 text-xs font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
                 Live
               </span>
             )}
@@ -157,44 +141,43 @@ export default function ExpertCard({
 
       {/* Content */}
       <div className="p-4 sm:p-5">
-        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none">
-          <pre className="whitespace-pre-wrap font-sans text-neutral-700 dark:text-neutral-300 leading-relaxed text-sm">
+        <div className="prose prose-sm prose-slate dark:prose-invert max-w-none">
+          <pre className="whitespace-pre-wrap font-sans text-slate-700 dark:text-slate-300 leading-relaxed text-sm">
             {displayAnswer}
-            {isStreaming && <span className="cursor-blink" />}
+            {isStreaming && (
+              <span className="inline-block w-2 h-4 ml-0.5 bg-current animate-pulse" />
+            )}
           </pre>
         </div>
 
         {/* Expand/Collapse */}
         {isLong && (
-          <motion.button
+          <button
             onClick={() => setIsExpanded(!isExpanded)}
             className={`
               mt-4 px-4 py-2 rounded-lg text-sm font-medium
               ${colorClasses.bgLight} ${colorClasses.text}
               border ${colorClasses.border}
-              hover:opacity-80 transition-all
+              hover:opacity-80 transition-all active:scale-[0.98]
             `}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
           >
             {isExpanded ? "Show Less" : "Read More"}
-          </motion.button>
+          </button>
         )}
       </div>
 
       {/* Streaming progress indicator */}
       {isStreaming && (
-        <motion.div
-          className={`h-0.5 bg-gradient-to-r ${persona.gradient}`}
-          initial={{ width: 0 }}
-          animate={{ width: "100%" }}
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-        />
+        <div className="h-0.5 overflow-hidden">
+          <div
+            className={`h-full bg-gradient-to-r ${persona.gradient} animate-shimmer`}
+            style={{
+              animation: "shimmer 2s linear infinite",
+              backgroundSize: "200% 100%",
+            }}
+          />
+        </div>
       )}
-    </motion.div>
+    </div>
   );
 }

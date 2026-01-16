@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 interface StreamingTextProps {
   content: string;
   isStreaming?: boolean;
@@ -13,30 +11,18 @@ export default function StreamingText({
 }: StreamingTextProps) {
   return (
     <div className="relative">
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="prose prose-neutral dark:prose-invert max-w-none"
-      >
-        <pre className="whitespace-pre-wrap font-sans text-neutral-800 dark:text-neutral-200 leading-relaxed text-base">
+      <div className="prose prose-slate dark:prose-invert max-w-none animate-fade-in">
+        <pre className="whitespace-pre-wrap font-sans text-slate-800 dark:text-slate-200 leading-relaxed text-base">
           {content}
           {isStreaming && (
-            <motion.span
-              className="cursor-blink ml-0.5"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            />
+            <span className="inline-block w-2 h-5 ml-0.5 bg-violet-500 animate-pulse rounded-sm" />
           )}
         </pre>
-      </motion.div>
+      </div>
 
       {/* Streaming glow effect */}
       {isStreaming && (
-        <motion.div
-          className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.5 }}
-        />
+        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-white dark:from-slate-900 to-transparent pointer-events-none opacity-50" />
       )}
     </div>
   );

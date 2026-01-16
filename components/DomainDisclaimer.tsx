@@ -1,7 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
-
 interface DomainDisclaimerProps {
   domain: string;
 }
@@ -9,15 +7,10 @@ interface DomainDisclaimerProps {
 export default function DomainDisclaimer({ domain }: DomainDisclaimerProps) {
   if (domain === "healthcare") {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="glass-card p-5 border-l-4 border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20"
-      >
+      <div className="card p-5 border-l-4 border-teal-500 bg-teal-50/50 dark:bg-teal-950/20 animate-fade-in-up">
         <div className="flex gap-4">
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center shadow-lg shadow-teal-500/20">
               <svg
                 className="h-5 w-5 text-white"
                 viewBox="0 0 20 20"
@@ -32,10 +25,10 @@ export default function DomainDisclaimer({ domain }: DomainDisclaimerProps) {
             </div>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-emerald-800 dark:text-emerald-200 mb-2">
+            <h3 className="text-sm font-semibold text-teal-800 dark:text-teal-200 mb-2">
               Medical Disclaimer
             </h3>
-            <div className="text-sm text-emerald-700 dark:text-emerald-300 space-y-2">
+            <div className="text-sm text-teal-700 dark:text-teal-300 space-y-2">
               <p>
                 This system provides{" "}
                 <strong>informational purposes only</strong> and is not a
@@ -50,7 +43,7 @@ export default function DomainDisclaimer({ domain }: DomainDisclaimerProps) {
                   "Responses may include ICD-10 and SNOMED CT codes for reference",
                 ].map((item, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <span className="text-emerald-500 mt-0.5">•</span>
+                    <span className="text-teal-500 mt-0.5">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -58,21 +51,16 @@ export default function DomainDisclaimer({ domain }: DomainDisclaimerProps) {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
   if (domain === "finance") {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="glass-card p-5 border-l-4 border-amber-500 bg-amber-50/50 dark:bg-amber-950/20"
-      >
+      <div className="card p-5 border-l-4 border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 animate-fade-in-up">
         <div className="flex gap-4">
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
               <svg
                 className="h-5 w-5 text-white"
                 viewBox="0 0 20 20"
@@ -87,10 +75,10 @@ export default function DomainDisclaimer({ domain }: DomainDisclaimerProps) {
             </div>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-amber-800 dark:text-amber-200 mb-2">
+            <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-200 mb-2">
               Financial Disclaimer
             </h3>
-            <div className="text-sm text-amber-700 dark:text-amber-300 space-y-2">
+            <div className="text-sm text-blue-700 dark:text-blue-300 space-y-2">
               <p>
                 This system provides{" "}
                 <strong>informational purposes only</strong> and is not
@@ -104,7 +92,7 @@ export default function DomainDisclaimer({ domain }: DomainDisclaimerProps) {
                   "All outputs should be reviewed by certified professionals (CPA, CFA, etc.)",
                 ].map((item, idx) => (
                   <li key={idx} className="flex items-start gap-2">
-                    <span className="text-amber-500 mt-0.5">•</span>
+                    <span className="text-blue-500 mt-0.5">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -112,7 +100,7 @@ export default function DomainDisclaimer({ domain }: DomainDisclaimerProps) {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
