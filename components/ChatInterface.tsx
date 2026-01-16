@@ -155,12 +155,7 @@ export default function ChatInterface({
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12 space-y-8">
       {/* Hero Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center space-y-4"
-      >
+      <div className="text-center space-y-4 animate-fade-in-up">
         <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold">
           <span className={`bg-gradient-to-r ${getDomainGradient()} bg-clip-text text-transparent`}>
             {title}
@@ -169,7 +164,7 @@ export default function ChatInterface({
         <p className="text-neutral-600 dark:text-neutral-400 text-lg max-w-2xl mx-auto">
           {description}
         </p>
-      </motion.div>
+      </div>
 
       {/* Domain Disclaimer */}
       <DomainDisclaimer domain={domain} />
@@ -181,12 +176,7 @@ export default function ChatInterface({
       <DocumentUpload domain={domain} onAnalyze={handleDocumentAnalyze} />
 
       {/* Query Form */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-        className="glass-card p-6 sm:p-8"
-      >
+      <div className="glass-card p-6 sm:p-8 animate-fade-in-up stagger-1">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1 relative">
@@ -205,26 +195,20 @@ export default function ChatInterface({
                   disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
-            <motion.button
+            <button
               type="submit"
               disabled={loading || !query.trim()}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
               className={`
                 px-8 py-4 rounded-xl font-semibold text-white
                 bg-gradient-to-r ${getDomainGradient()}
-                shadow-lg hover:shadow-xl
+                shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]
                 disabled:opacity-50 disabled:cursor-not-allowed
                 transition-all duration-200 flex items-center justify-center gap-2
               `}
             >
               {loading ? (
                 <>
-                  <motion.div
-                    className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  />
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   <span>Processing...</span>
                 </>
               ) : (
@@ -235,7 +219,7 @@ export default function ChatInterface({
                   </svg>
                 </>
               )}
-            </motion.button>
+            </button>
           </div>
 
           {/* Streaming Toggle */}
@@ -256,7 +240,7 @@ export default function ChatInterface({
             </span>
           </label>
         </form>
-      </motion.div>
+      </div>
 
       {/* Error Display */}
       <AnimatePresence>

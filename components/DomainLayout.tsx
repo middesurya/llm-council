@@ -67,16 +67,13 @@ export default function DomainLayout({
   return (
     <div className={`min-h-screen flex flex-col domain-${currentDomain}`}>
       {/* Premium Glassmorphism Navigation */}
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+      <nav
         className={`
-          sticky top-0 z-50 transition-all duration-300
+          sticky top-0 z-50 transition-all duration-300 animate-fade-in-down
           ${
             scrolled
               ? "bg-white/70 dark:bg-neutral-900/70 backdrop-blur-xl shadow-lg border-b border-neutral-200/50 dark:border-neutral-800/50"
-              : "bg-transparent"
+              : "bg-white/50 dark:bg-neutral-900/50 backdrop-blur-sm"
           }
         `}
       >
@@ -234,17 +231,13 @@ export default function DomainLayout({
             )}
           </AnimatePresence>
         </div>
-      </motion.nav>
+      </nav>
 
       {/* Main Content */}
       <main className="flex-1">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-        >
+        <div className="animate-fade-in-up">
           {children}
-        </motion.div>
+        </div>
       </main>
 
       {/* Premium Footer */}
