@@ -302,7 +302,7 @@ export const typingCursor: Variants = {
       duration: 1,
       repeat: Infinity,
       repeatType: "loop",
-      ease: "steps(1)",
+      ease: "linear",
     },
   },
 };
