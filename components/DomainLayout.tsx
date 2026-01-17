@@ -218,8 +218,10 @@ export default function DomainLayout({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1">
-        <div className="animate-fade-in-up">{children}</div>
+      <main className="flex-1 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in-up">
+          {children}
+        </div>
       </main>
 
       {/* Footer */}
