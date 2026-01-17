@@ -85,7 +85,7 @@ export default function DomainLayout({
           }
         `}
       >
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <nav className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16 md:h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
@@ -218,8 +218,8 @@ export default function DomainLayout({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 w-full">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in-up">
+      <main className="flex-1 w-full flex flex-col items-center py-6 sm:py-8 lg:py-12">
+        <div className="max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in-up">
           {children}
         </div>
       </main>
@@ -229,7 +229,7 @@ export default function DomainLayout({
         {/* Gradient Line Decoration */}
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-violet-500 to-transparent opacity-50" />
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Brand Section */}
             <div className="col-span-1 md:col-span-2">

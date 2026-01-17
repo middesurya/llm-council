@@ -47,7 +47,7 @@ Please provide a differential diagnosis and appropriate recommendations.`;
   };
 
   return (
-    <div className="card overflow-hidden animate-fade-in-up">
+    <div className="card w-full overflow-hidden animate-fade-in-up">
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full px-6 py-4 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
@@ -172,7 +172,7 @@ Please provide comprehensive financial analysis and recommendations.`;
   };
 
   return (
-    <div className="card overflow-hidden animate-fade-in-up">
+    <div className="card w-full overflow-hidden animate-fade-in-up">
       <button
         onClick={() => setExpanded(!expanded)}
         className="w-full px-6 py-4 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"

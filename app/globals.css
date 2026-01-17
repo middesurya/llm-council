@@ -135,6 +135,11 @@
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* === Content Widths === */
+  --content-max-outer: 72rem;  /* 1152px - max-w-6xl */
+  --content-max-inner: 64rem;  /* 1024px - max-w-5xl */
+  --content-max-prose: 65ch;   /* max-w-prose */
 }
 
 /* === Dark Mode === */
@@ -274,6 +279,25 @@ h6 { font-size: 1rem; }
     padding-left: var(--space-8);
     padding-right: var(--space-8);
   }
+}
+
+/* Layout container utilities for tiered content widths */
+.layout-outer {
+  max-width: var(--content-max-outer);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.layout-inner {
+  max-width: var(--content-max-inner);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.layout-prose {
+  max-width: var(--content-max-prose);
 }
 
 /* ===========================================
